@@ -66,7 +66,7 @@ class INET_API IRadioMedium : public IPrintableObject
     virtual const IPathLoss *getPathLoss() const = 0;
 
     /**
-     * Returns the radio signal path loss model of this radio medium. This
+     * Returns the radio signal obstacle loss model of this radio medium. This
      * function may return nullptr.
      */
     virtual const IObstacleLoss *getObstacleLoss() const = 0;

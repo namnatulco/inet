@@ -1,3 +1,57 @@
+Change the physical layer to support the following:
+ - separate transmission/reception start and transmission/reception end
+ - mobility state changes during transmission, propagation and reception
+ - aborting an ongoing transmission
+ - capturing a reception while receiving another
+ - better energy detection and clear channel assessment
+ - preamble/pilot detection, separate synchronization phase
+ - carrier/signal loss detection during reception
+
+Transmitter:
+ - the past of a transmission is always certain and never change
+ - the future of a transmission is always uncertain and may change at any time
+ - the transmitter notifies the medium about changes in the future of a transmission as soon as they become known
+ - the first notification regarding a transmission happens at the start of the transmission
+ - the last notification regarding a transmission happens at the last change in the future of the transmission
+ - if there are no changes in the future of a transmission, then there's only one notification when it starts
+ - this scheme allows optimistic concurrent and parallel computation with cache invalidation upon changes
+ - for example, the transmitter notifies the medium about *unforeseen*:
+   - abort of a transmission (e.g. a power failure)
+   - transmission power change (e.g. to overcome interfering noise)
+   - space-time coordinate change (e.g. a mobility state change)
+ - the transmitter may have internal state changes independently of the above to allow processing at important points in the actual transmission process, for example:
+   - the start/end of pilot/preamble transmission
+   - the start/end of data transmission
+ - the transmitter doesn't notify the medium about state changes if the future of the current transmission is not affected
+
+Medium:
+ - the transmission change notification is a function call on the medium by the transmitter
+ - the medium propagates all transmission change notifications to all affected receivers 
+ - the medium converts transmission change notifications into reception change notifications
+ - the medium delays reception change notifications according to the propagation delay between the transmitter and the receiver
+ - the reception change notification is a message sent to the receiver by the medium
+ - the future of a transmission determines the future of a reception
+ - as time goes by the future of a transmission and a reception becomes the certain past
+
+Receiver:
+ - the past of a reception is always certain and never change
+ - the future of a reception is always uncertain and may change at any time
+ - the medium notifies the receiver about changes in the future of a reception as soon as they become known
+ - the first notification regarding a reception happens at the start of the reception
+ - the last notification regarding a reception happens at the last change in the future of the reception
+ - if there are no changes in the future of a reception, then there's only one notification when it starts
+ - this scheme allows optimistic concurrent and parallel computation with cache invalidation upon changes
+ - for example, the medium notifies the receiver about *unforeseen*:
+   - abort of a reception (e.g. a power failure)
+   - reception power change (e.g. to overcome interfering noise)
+   - space-time coordinate change (e.g. a mobility state change)
+ - the medium doesn't notify the receiver about state changes if the future of the current reception is not affected
+ - the receiver may have internal state changes independently of the above to allow processing at important points in the actual reception process, for example:
+   - the start/end of clear channel assessment
+   - the start/end of pilot/preamble synchronization
+   - the start/end of data reception
+
+Other:
  - rename speed to velocity (speed is scalar)
  - rename loss to gain?
  - consider renaming sensitivity to minReceptionPower, or some other unification
