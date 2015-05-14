@@ -1,0 +1,32 @@
+Glossary
+========
+
+coordination function
+distributed coordination function/point coordination function/hybrid coordination function/mesh coordination function
+dcf/pcf/hcf/mcf
+fragmentation/defragmentation
+multirate/autorate
+transmission process
+reception process
+backoff procedure
+channel state
+packet classifier
+packet queue
+block ack mechanism/no ack mechanism
+protection mechanism
+transmission policy
+rts/cts policy
+aggregation policy
+fragmentation policy
+data frame/control frame/management frame/time priority management frame
+contention period/contention free period
+
+sta/ap/portal
+stationary/portable/mobile
+bss/ibss/mbss/qosbss
+ds/ess
+
+basic rate set/basic mcs set
+
+edca/hcca/txop
+channel measurement
