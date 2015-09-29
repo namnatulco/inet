@@ -35,6 +35,7 @@ out/
 *.pdb
 *.idb
 *.manifest
+.qtenv.ini
 .tkenvrc
 .tkenvlog
 .cmdenv-log
