@@ -46,7 +46,6 @@ RadioMedium::RadioMedium() :
     mediumLimitCache(nullptr),
     neighborCache(nullptr),
     communicationCache(nullptr),
-    mediumVisualizer(nullptr),
     transmissionCount(0),
     radioFrameSendCount(0),
     receptionComputationCount(0),
@@ -88,7 +87,6 @@ void RadioMedium::initialize(int stage)
         neighborCache = dynamic_cast<INeighborCache *>(getSubmodule("neighborCache"));
         communicationCache = check_and_cast<ICommunicationCache *>(getSubmodule("communicationCache"));
         physicalEnvironment = dynamic_cast<IPhysicalEnvironment *>(getModuleByPath("environment"));
-        mediumVisualizer = dynamic_cast<MediumVisualizer *>(getSubmodule("mediumVisualizer"));
         material = physicalEnvironment != nullptr ? physicalEnvironment->getMaterialRegistry()->getMaterial("air") : nullptr;
         const char *rangeFilterString = par("rangeFilter");
         if (!strcmp(rangeFilterString, ""))
@@ -164,8 +162,6 @@ void RadioMedium::handleMessage(cMessage *message)
 {
     if (message == removeNonInterferingTransmissionsTimer) {
         removeNonInterferingTransmissions();
-        if (mediumVisualizer != nullptr)
-            mediumVisualizer->mediumChanged();
     }
     else
         throw cRuntimeError("Unknown message");
@@ -232,8 +228,6 @@ void RadioMedium::removeNonInterferingTransmissions()
     EV_DEBUG << "Removing " << transmissionIndex << " non interfering transmissions\n";
     for (auto it = transmissions.cbegin(); it != transmissions.cbegin() + transmissionIndex; it++) {
         const ITransmission *transmission = *it;
-        if (mediumVisualizer != nullptr)
-            mediumVisualizer->removeTransmission(transmission);
         communicationCache->removeTransmission(transmission);
         delete transmission;
     }
@@ -464,8 +458,6 @@ void RadioMedium::addTransmission(const IRadio *transmitterRadio, const ITransmi
         Enter_Method_Silent();
         scheduleAt(communicationCache->getCachedInterferenceEndTime(transmissions[0]), removeNonInterferingTransmissionsTimer);
     }
-    if (mediumVisualizer != nullptr)
-        mediumVisualizer->addTransmission(transmission);
 }
 
 void RadioMedium::sendToAffectedRadios(IRadio *radio, const IRadioFrame *frame)
@@ -544,8 +536,6 @@ cPacket *RadioMedium::receivePacket(const IRadio *radio, IRadioFrame *radioFrame
     communicationCache->removeCachedDecision(radio, transmission);
     cPacket *macFrame = decision->getMacFrame()->dup();
     macFrame->setControlInfo(const_cast<ReceptionIndication *>(decision->getIndication()));
-    if (mediumVisualizer != nullptr)
-        mediumVisualizer->receivePacket(decision);
     delete decision;
     return macFrame;
 }
@@ -586,8 +576,6 @@ bool RadioMedium::isReceptionAttempted(const IRadio *radio, const ITransmission 
     bool isReceptionAttempted = radio->getReceiver()->computeIsReceptionAttempted(listening, reception, interference);
     delete interference;
     EV_DEBUG << "Receiving " << transmission << " from medium by " << radio << " arrives as " << reception << " and results in reception is " << (isReceptionAttempted ? "attempted" : "ignored") << endl;
-    if (mediumVisualizer != nullptr)
-        mediumVisualizer->mediumChanged();
     return isReceptionAttempted;
 }
 
