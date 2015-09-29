@@ -283,26 +283,30 @@ void Radio::startTransmission(cPacket *macFrame)
     if (endTransmissionTimer->isScheduled())
         throw cRuntimeError("Received frame from upper layer while already transmitting.");
     const RadioFrame *radioFrame = check_and_cast<const RadioFrame *>(medium->transmitPacket(this, macFrame));
-    EV_INFO << "Transmission of " << (IRadioFrame *)radioFrame << " as " << radioFrame->getTransmission() << " is started.\n";
+    const ITransmission *transmission = radioFrame->getTransmission();
+    EV_INFO << "Transmission of " << (IRadioFrame *)radioFrame << " as " << transmission << " is started.\n";
     ASSERT(radioFrame->getDuration() != 0);
     endTransmissionTimer->setControlInfo(const_cast<RadioFrame *>(radioFrame));
     scheduleAt(simTime() + radioFrame->getDuration(), endTransmissionTimer);
     updateTransceiverState();
+    check_and_cast<RadioMedium *>(medium)->fireTransmissionStarted(transmission);
     delete macFrame->removeControlInfo();
 }
 
 void Radio::endTransmission()
 {
-    RadioFrame *radioFrame = static_cast<RadioFrame *>(endTransmissionTimer->removeControlInfo());
-    EV_INFO << "Transmission of " << (IRadioFrame *)radioFrame << " as " << radioFrame->getTransmission() << " is completed.\n";
+    const RadioFrame *radioFrame = static_cast<RadioFrame *>(endTransmissionTimer->removeControlInfo());
+    const ITransmission *transmission = radioFrame->getTransmission();
+    EV_INFO << "Transmission of " << (IRadioFrame *)radioFrame << " as " << transmission << " is completed.\n";
     updateTransceiverState();
+    check_and_cast<RadioMedium *>(medium)->fireTransmissionEnded(transmission);
     delete radioFrame;
 }
 
 void Radio::startReception(RadioFrame *radioFrame)
 {
     const ITransmission *transmission = radioFrame->getTransmission();
-    const IArrival *arrival = medium->getArrival(this, radioFrame->getTransmission());
+    const IArrival *arrival = medium->getArrival(this, transmission);
     cMessage *timer = new cMessage("endReception");
     timer->setControlInfo(radioFrame);
     if (arrival->getStartTime() == simTime()) {
@@ -313,11 +317,13 @@ void Radio::startReception(RadioFrame *radioFrame)
     }
     scheduleAt(arrival->getEndTime(), timer);
     updateTransceiverState();
+    check_and_cast<RadioMedium *>(medium)->fireReceptionStarted(medium->getReception(this, transmission));
 }
 
 void Radio::endReception(cMessage *message)
 {
     RadioFrame *radioFrame = static_cast<RadioFrame *>(message->getControlInfo());
+    const ITransmission *transmission = radioFrame->getTransmission();
     EV_INFO << "Reception of " << (IRadioFrame *)radioFrame << " as " << radioFrame->getTransmission() << " is completed.\n";
     if ((radioMode == RADIO_MODE_RECEIVER || radioMode == RADIO_MODE_TRANSCEIVER) && message == endReceptionTimer) {
         cPacket *macFrame = medium->receivePacket(this, radioFrame);
@@ -333,8 +339,9 @@ void Radio::endReception(cMessage *message)
         send(macFrame, upperLayerOut);
         endReceptionTimer = nullptr;
     }
-    delete message;
     updateTransceiverState();
+    check_and_cast<RadioMedium *>(medium)->fireReceptionEnded(medium->getReception(this, transmission));
+    delete message;
 }
 
 bool Radio::isReceptionEndTimer(cMessage *message)
