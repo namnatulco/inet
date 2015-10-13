@@ -1,0 +1,79 @@
+//
+// Copyright (C) 2006 Andras Varga
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+
+package inet.visualizer.integrated;
+
+import inet.visualizer.contract.IIntegratedVisualizer;
+import inet.visualizer.contract.ILinkLayerVisualizer;
+import inet.visualizer.contract.IMediumVisualizer;
+import inet.visualizer.contract.IMobilityVisualizer;
+import inet.visualizer.contract.INetworkLayerVisualizer;
+import inet.visualizer.contract.INetworkNodeVisualizer;
+import inet.visualizer.contract.IPhysicalEnvironmentVisualizer;
+import inet.visualizer.contract.ISceneVisualizer;
+import inet.visualizer.contract.ITracingObstacleLossVisualizer;
+
+//
+// This module integrates all canvas visualizers into a single module.
+//
+module IntegratedCanvasVisualizer like IIntegratedVisualizer
+{
+    parameters:
+        @display("bgb=0,0;i=block/app_s");
+        string sceneVisualizerType = default("SceneCanvasVisualizer");
+        string physicalEnvironmentVisualizerType = default("PhysicalEnvironmentCanvasVisualizer");
+        string networkNodeVisualizerType = default("NetworkNodeCanvasVisualizer");
+        string mobilityVisualizerType = default("MobilityCanvasVisualizer");
+        string mediumVisualizerType = default("MediumCanvasVisualizer");
+        string obsacleLossVisualizerType = default("TracingObstacleLossCanvasVisualizer");
+        string linkLayerVisualizerType = default("LinkLayerCanvasVisualizer");
+        string networkLayerVisualizerType = default("NetworkLayerCanvasVisualizer");
+    submodules:
+        sceneVisualizer: <sceneVisualizerType> like ISceneVisualizer if sceneVisualizerType != "" {
+            parameters:
+                @display("p=150,50");
+        }
+        physicalEnvironmentVisualizer: <physicalEnvironmentVisualizerType> like IPhysicalEnvironmentVisualizer if physicalEnvironmentVisualizerType != "" {
+            parameters:
+                @display("p=150,150");
+        }
+        networkNodeVisualizer: <networkNodeVisualizerType> like INetworkNodeVisualizer if networkNodeVisualizerType != "" {
+            parameters:
+                @display("p=150,250");
+        }
+        mobilityVisualizer: <mobilityVisualizerType> like IMobilityVisualizer if mobilityVisualizerType != "" {
+            parameters:
+                @display("p=150,350");
+        }
+        mediumVisualizer: <mediumVisualizerType> like IMediumVisualizer if mediumVisualizerType != "" {
+            parameters:
+                @display("p=150,450");
+        }
+        obsacleLossVisualizer: <obsacleLossVisualizerType> like ITracingObstacleLossVisualizer if obsacleLossVisualizerType != "" {
+            parameters:
+                @display("p=150,550");
+        }
+        linkLayerVisualizer: <linkLayerVisualizerType> like ILinkLayerVisualizer if linkLayerVisualizerType != "" {
+            parameters:
+                @display("p=150,650");
+        }
+        networkLayerVisualizer: <networkLayerVisualizerType> like INetworkLayerVisualizer if networkLayerVisualizerType != "" {
+            parameters:
+                @display("p=150,750");
+        }
+}
