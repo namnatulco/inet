@@ -1026,4 +1026,16 @@
         compileFlags = "-DWITH_CSMA"
         linkerFlags = ""
         />
+    <feature
+        id="OSG_visualization"
+        name="OSG visualization"
+        description = "The OSG (open scene graph) based 3D visualization"
+        initiallyEnabled = "true"
+        requires = ""
+        labels = ""
+        nedPackages = ""
+        extraSourceFolders = ""
+        compileFlags = "-DWITH_OSG"
+        linkerFlags = ""
+        />
 </features>
