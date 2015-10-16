@@ -1,0 +1,5 @@
+<environment>
+    <object position="min 15 15 0" orientation="0 0 0" shape="prism 10 0 0 85 0 100 145 15 154" material="brick" fill-color="203 65 84" opacity="0.5"/>
+    <object position="min 30 168 0" orientation="0 0 0" shape="prism 10 0 0 85 -9 96 138 14 147" material="brick" fill-color="203 65 84" opacity="0.5"/>
+    <!--  <object position="min 128 36 0" orientation="0 0 0" shape="prism 10 0 0 50 0 77 290 26 275" material="wood" fill-color="160 228 160" opacity="0.5"/> -->
+</environment>

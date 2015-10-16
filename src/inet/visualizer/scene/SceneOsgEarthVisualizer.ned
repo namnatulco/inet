@@ -30,5 +30,5 @@ simple SceneOsgEarthVisualizer extends SceneOsgVisualizerBase like ISceneVisuali
         string sceneMap; // map file, e.g. some part of the earth
         double playgroundLongitude; // geographic position of the playground origin
         double playgroundLatitude; // geographic position of the playground origin
-        double playgroundOrientation; // orientation of the playground
+        double playgroundOrientation @unit(deg); // orientation of the playground
 }
