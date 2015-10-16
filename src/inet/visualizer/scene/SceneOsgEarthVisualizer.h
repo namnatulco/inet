@@ -20,6 +20,7 @@
 
 #include "inet/visualizer/base/SceneOsgVisualizerBase.h"
 #include <osgEarth/MapNode>
+#include <osgEarthAnnotation/RectangleNode>
 #include <osgEarthUtil/ObjectLocator>
 
 namespace inet {
@@ -34,8 +35,8 @@ class INET_API SceneOsgEarthVisualizer : public SceneOsgVisualizerBase
 #ifdef WITH_OSG
 
   protected:
-    double playgroundLatitude;
     double playgroundLongitude;
+    double playgroundLatitude;
     double playgroundOrientation;
     double cameraDistanceFactor;
 
@@ -47,13 +48,6 @@ class INET_API SceneOsgEarthVisualizer : public SceneOsgVisualizerBase
     virtual void initialize(int stage) override;
     virtual void initializeScene();
     virtual void initializeViewpoint();
-
-    // https://en.wikipedia.org/wiki/Decimal_degrees
-    // TODO: consider playgroundOrientation
-    virtual double toLatitude(double y) const { return playgroundLatitude - y / 111320; }
-    virtual double toLongitude(double x) const { return playgroundLongitude +  x / 111320 / cos(fabs(playgroundLatitude / 180 * M_PI)); }
-    virtual double toY(double latitude) const {  return (playgroundLatitude - latitude) * 111320; }
-    virtual double toX(double longitude) const { return (longitude - playgroundLongitude) * cos(fabs(playgroundLatitude / 180 * M_PI)) * 111111; }
 
   public:
     virtual osg::Group *getMainPart() override;

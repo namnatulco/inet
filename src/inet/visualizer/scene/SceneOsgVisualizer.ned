@@ -27,8 +27,4 @@ simple SceneOsgVisualizer extends SceneOsgVisualizerBase like ISceneVisualizer
 {
     parameters:
         @class(SceneOsgVisualizer);
-        bool displayPlayground = default(true); // display the playground
-        string playgroundColor = default("#A0E0A0"); // playground solid color if playground texture is not provided 
-        string playgroundImage = default(""); // playground texture (repeated)
-        double playgroundImageSize @unit(m) = default(1m); // playground texture size
 }

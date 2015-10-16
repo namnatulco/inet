@@ -45,6 +45,7 @@ Vec3Array *createAnnulusVertices(const Coord& center, double outerRadius, double
 Geometry *createLineGeometry(const Coord& begin, const Coord& end);
 Geometry *createCircleGeometry(const Coord& center, double radius, int polygonSize);
 Geometry *createAnnulusGeometry(const Coord& center, double outerRadius, double innerRadius, int polygonSize);
+Geometry *createQuadGeometry(const Coord& begin, const Coord& end);
 Geometry *createPolygonGeometry(const std::vector<Coord>& points, const Coord& translation = Coord::ZERO);
 
 osgText::Text *createText(const char *string, const Coord& position, const cFigure::Color& color);

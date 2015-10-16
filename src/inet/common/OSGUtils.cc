@@ -115,6 +115,19 @@ Geometry *createAnnulusGeometry(const Coord& center, double outerRadius, double 
     return geometry;
 }
 
+Geometry *createQuadGeometry(const Coord& min, const Coord& max)
+{
+    auto geometry = new Geometry();
+    auto vertices = new Vec3Array();
+    vertices->push_back(Vec3(min.x, min.y, min.z));
+    vertices->push_back(Vec3(min.x, max.y, min.z));
+    vertices->push_back(Vec3(max.x, max.y, min.z));
+    vertices->push_back(Vec3(max.x, min.y, min.z));
+    geometry->setVertexArray(vertices);
+    geometry->addPrimitiveSet(new DrawArrays(PrimitiveSet::QUADS, 0, 4));
+    return geometry;
+}
+
 Geometry *createPolygonGeometry(const std::vector<Coord>& points, const Coord& translation)
 {
     auto geometry = new Geometry();

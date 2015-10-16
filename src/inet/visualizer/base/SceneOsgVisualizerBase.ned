@@ -29,4 +29,10 @@ simple SceneOsgVisualizerBase extends SceneVisualizerBase
         double zNear @unit(m) = default(0.1m); // near distance for optimization
         double zFar @unit(m) = default(100000m); // far distance for optimization
         double fieldOfView @unit(deg) = default(30deg); // camera field of view
+        bool displayPlayground = default(true); // display the playground
+        string playgroundColor = default("#A0E0A0"); // playground solid color if playground texture is not provided
+        double playgroundOpacity = default(1.0); // playground opacity 
+        string playgroundImage = default(""); // playground texture (repeated)
+        double playgroundImageSize @unit(m) = default(1m); // playground texture size
+        bool playgroundShading = default(true); // exponential shading
 }

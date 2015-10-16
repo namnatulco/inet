@@ -35,10 +35,8 @@ class INET_API SceneOsgVisualizer : public SceneOsgVisualizerBase
   protected:
     virtual void initialize(int stage) override;
     virtual void initializeScene();
-    virtual void initializePlayground();
     virtual void initializeAxis(double axisLength);
     virtual void initializeViewpoint();
-    virtual osg::Geode *createPlayground(const Coord& min, const Coord& max) const;
 
   public:
     virtual osg::Group *getMainPart() override;

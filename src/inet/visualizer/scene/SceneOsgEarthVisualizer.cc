@@ -25,7 +25,6 @@
 #include <osgDB/ReadFile>
 #include <osgEarth/Capabilities>
 #include <osgEarth/Viewpoint>
-#include <osgEarthAnnotation/RectangleNode>
 
 namespace inet {
 
@@ -41,7 +40,7 @@ using namespace inet::physicalenvironment;
 
 void SceneOsgEarthVisualizer::initialize(int stage)
 {
-    SceneVisualizerBase::initialize(stage);
+    SceneOsgVisualizerBase::initialize(stage);
     if (!hasGUI()) return;
     if (stage == INITSTAGE_LOCAL) {
         playgroundLatitude = par("playgroundLatitude");
@@ -51,6 +50,8 @@ void SceneOsgEarthVisualizer::initialize(int stage)
         initializeScene();
     }
     else if (stage == INITSTAGE_LAST) {
+        if (par("displayPlayground"))
+            initializePlayground();
         initializeViewpoint();
     }
 }

@@ -16,15 +16,113 @@
 //
 
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/OSGUtils.h"
 #include "inet/visualizer/base/SceneOsgVisualizerBase.h"
 #include "inet/visualizer/networknode/NetworkNodeOsgVisualizer.h"
-#include <osg/Geode>
+#include <osg/PolygonOffset>
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
+#include <osgDB/ReadFile>
 
 namespace inet {
 
 namespace visualizer {
+
+void SceneOsgVisualizerBase::initializePlayground()
+{
+    Box playgroundBounds = getPlaygroundBounds();
+    if (playgroundBounds.getMin() != playgroundBounds.getMax()) {
+        const char *imageString = par("playgroundImage");
+        osg::Image *image = nullptr;
+        if (*imageString != '\0') {
+            image = inet::osg::createImage(imageString);
+            if (image == nullptr)
+                throw cRuntimeError("Cannot read playground image: '%s'", imageString);
+        }
+        double imageSize = par("playgroundImageSize");
+        auto color = cFigure::Color(par("playgroundColor"));
+        double opacity = par("playgroundOpacity");
+        bool shading = par("playgroundShading");
+        auto playground = createPlayground(playgroundBounds.getMin(), playgroundBounds.getMax(), color, image, imageSize, opacity, shading);
+        getMainPart()->addChild(playground);
+    }
+}
+
+osg::Geode *SceneOsgVisualizerBase::createPlayground(const Coord& min, const Coord& max, cFigure::Color& color, osg::Image* image, double imageSize, double opacity, bool shading) const
+{
+    auto dx = max.x - min.x;
+    auto dy = max.y - min.y;
+    auto d = shading ? sqrt(dx * dx + dy * dy) : 0;
+    auto width = dx + 2 * d;
+    auto height = dy + 2 * d;
+    auto r = width / imageSize / 2;
+    auto t = height / imageSize / 2;
+    osg::Geometry *geometry = nullptr;
+    if (image == nullptr)
+        geometry = inet::osg::createQuadGeometry(min, max);
+    else
+        geometry = osg::createTexturedQuadGeometry(osg::Vec3(min.x - d, min.y - d, 0.0), osg::Vec3(width, 0.0, 0.0), osg::Vec3(0.0, height, 0.0), -r, -t, r, t);
+    auto stateSet = inet::osg::createStateSet(color, opacity, false);
+    geometry->setStateSet(stateSet);
+    osg::Texture2D *texture = nullptr;
+    if (image != nullptr) {
+        texture = new osg::Texture2D();
+        texture->setImage(image);
+        texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT);
+        texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::REPEAT);
+    }
+    stateSet->setTextureAttributeAndModes(0, texture);
+    if (shading) {
+        auto program = new osg::Program();
+        auto vertexShader = new osg::Shader(osg::Shader::VERTEX);
+        auto fragmentShader = new osg::Shader(osg::Shader::FRAGMENT);
+        vertexShader->setShaderSource(R"(
+            varying vec4 verpos;
+            void main() {
+                gl_Position = ftransform();
+                verpos = gl_Vertex;
+                gl_TexCoord[0]=gl_MultiTexCoord0;
+            })");
+        if (texture != nullptr) {
+            fragmentShader->setShaderSource(R"(
+                varying vec4 verpos;
+                uniform vec3 center;
+                uniform float min, max;
+                uniform sampler2D texture;
+                void main(void) {
+                    float alpha = 1.0 - smoothstep(min, max, length(verpos.xyz - center));
+                    gl_FragColor = vec4(texture2D(texture, gl_TexCoord[0].xy).rgb, alpha);
+                })");
+            stateSet->addUniform(new osg::Uniform("texture", 0));
+        }
+        else {
+            fragmentShader->setShaderSource(R"(
+                varying vec4 verpos;
+                uniform vec3 center;
+                uniform vec3 color;
+                uniform float min, max;
+                void main(void) {
+                    float alpha = 1.0 - smoothstep(min, max, length(verpos.xyz - center));
+                    gl_FragColor = vec4(color, alpha);
+                })");
+            stateSet->addUniform(new osg::Uniform("color", osg::Vec3((double)color.red / 255.0, (double)color.green / 255.0, (double)color.blue / 255.0)));
+        }
+        program->addShader(vertexShader);
+        program->addShader(fragmentShader);
+        auto center = (max + min) / 2;
+        stateSet->addUniform(new osg::Uniform("center", osg::Vec3(center.x, center.y, center.z)));
+        stateSet->addUniform(new osg::Uniform("min", (float)d / 2));
+        stateSet->addUniform(new osg::Uniform("max", (float)d));
+        stateSet->setAttributeAndModes(program, osg::StateAttribute::ON);
+    }
+    auto polygonOffset = new osg::PolygonOffset();
+    polygonOffset->setFactor(1.0);
+    polygonOffset->setUnits(1.0);
+    stateSet->setAttributeAndModes(polygonOffset, osg::StateAttribute::OVERRIDE | osg::StateAttribute::ON);
+    auto geode = new osg::Geode();
+    geode->addDrawable(geometry);
+    return geode;
+}
 
 osg::BoundingSphere SceneOsgVisualizerBase::getNetworkBoundingSphere()
 {

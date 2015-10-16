@@ -19,6 +19,7 @@
 #define __INET_SCENEOSGVISUALIZERBASE_H
 
 #include "inet/visualizer/base/SceneVisualizerBase.h"
+#include <osg/Geode>
 #include <osg/Group>
 
 namespace inet {
@@ -28,6 +29,8 @@ namespace visualizer {
 class INET_API SceneOsgVisualizerBase : public SceneVisualizerBase
 {
   protected:
+    virtual void initializePlayground();
+    virtual osg::Geode *createPlayground(const Coord& min, const Coord& max, cFigure::Color& color, osg::Image* image, double imageSize, double opacity, bool shading) const;
     virtual osg::BoundingSphere getNetworkBoundingSphere();
 
   public:
