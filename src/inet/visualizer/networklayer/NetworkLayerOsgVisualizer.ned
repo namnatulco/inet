@@ -21,7 +21,7 @@ import inet.visualizer.base.NetworkLayerVisualizerBase;
 import inet.visualizer.contract.INetworkLayerVisualizer;
 
 //
-// This module visualizes the link layer communication using osg.
+// This module visualizes the network layer communication using osg.
 //
 simple NetworkLayerOsgVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
 {

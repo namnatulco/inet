@@ -15,16 +15,16 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.networklayer;
+package inet.visualizer.statistic;
 
-import inet.visualizer.base.NetworkLayerVisualizerBase;
-import inet.visualizer.contract.INetworkLayerVisualizer;
+import inet.visualizer.base.StatisticVisualizerBase;
+import inet.visualizer.contract.IStatisticVisualizer;
 
 //
-// This module visualizes the network layer communication on a canvas.
+// This module visualizes a statistic using osg.
 //
-simple NetworkLayerCanvasVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
+simple StatisticOsgVisualizer extends StatisticVisualizerBase like IStatisticVisualizer
 {
     parameters:
-        @class(NetworkLayerCanvasVisualizer);
+        @class(StatisticOsgVisualizer);
 }

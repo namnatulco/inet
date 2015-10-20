@@ -249,6 +249,7 @@ void MediumOsgVisualizer::radioAdded(const IRadio *radio)
             stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
             stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
             stateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+            stateSet->setAttributeAndModes(new osg::Program(), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
             auto geode = new osg::Geode();
             geode->addDrawable(geometry);
             auto autoTransform = new osg::AutoTransform();
@@ -264,10 +265,12 @@ void MediumOsgVisualizer::radioAdded(const IRadio *radio)
             auto texture = new osg::Texture2D();
             texture->setImage(receptionImage);
             auto geometry = osg::createTexturedQuadGeometry(osg::Vec3(0.0, 0.0, 0.0), osg::Vec3(receptionImage->s(), 0.0, 0.0), osg::Vec3(0.0, receptionImage->t(), 0.0), 0.0, 0.0, 1.0, 1.0);
-            geometry->getOrCreateStateSet()->setTextureAttributeAndModes(0, texture);
-            geometry->getOrCreateStateSet()->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-            geometry->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON);
-            geometry->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+            auto stateSet = geometry->getOrCreateStateSet();
+            stateSet->setTextureAttributeAndModes(0, texture);
+            stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+            stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+            stateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+            stateSet->setAttributeAndModes(new osg::Program(), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
             auto geode = new osg::Geode();
             geode->addDrawable(geometry);
             auto autoTransform = new osg::AutoTransform();

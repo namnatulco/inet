@@ -15,16 +15,30 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.networklayer;
+#include "inet/common/OSGUtils.h"
+#include "inet/visualizer/statistic/StatisticOsgVisualizer.h"
 
-import inet.visualizer.base.NetworkLayerVisualizerBase;
-import inet.visualizer.contract.INetworkLayerVisualizer;
+namespace inet {
 
-//
-// This module visualizes the network layer communication on a canvas.
-//
-simple NetworkLayerCanvasVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
+namespace visualizer {
+
+Define_Module(StatisticOsgVisualizer);
+
+#ifdef WITH_OSG
+
+void StatisticOsgVisualizer::initialize(int stage)
 {
-    parameters:
-        @class(NetworkLayerCanvasVisualizer);
+    StatisticVisualizerBase::initialize(stage);
+    if (!hasGUI()) return;
 }
+
+void StatisticOsgVisualizer::receiveSignal(cComponent *source, simsignal_t signal, cObject *object)
+{
+}
+
+#endif // ifdef WITH_OSG
+
+} // namespace visualizer
+
+} // namespace inet
+

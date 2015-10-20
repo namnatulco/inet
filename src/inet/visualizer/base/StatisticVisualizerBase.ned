@@ -15,16 +15,13 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.networklayer;
-
-import inet.visualizer.base.NetworkLayerVisualizerBase;
-import inet.visualizer.contract.INetworkLayerVisualizer;
+package inet.visualizer.base;
 
 //
-// This module visualizes the network layer communication on a canvas.
+// This is a base module for statistic visualizer simple modules.
 //
-simple NetworkLayerCanvasVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
+simple StatisticVisualizerBase extends VisualizerBase
 {
     parameters:
-        @class(NetworkLayerCanvasVisualizer);
+        string statisticSubscriptionModule = default(""); // specifies the module path where the visualizer subscribes for the statistic
 }

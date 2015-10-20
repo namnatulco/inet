@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2013 OpenSim Ltd.
+// Copyright (C) OpenSim Ltd.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
@@ -15,16 +15,19 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.networklayer;
+package inet.mobility.single;
 
-import inet.visualizer.base.NetworkLayerVisualizerBase;
-import inet.visualizer.contract.INetworkLayerVisualizer;
+import inet.mobility.base.MovingMobilityBase;
 
-//
-// This module visualizes the network layer communication on a canvas.
-//
-simple NetworkLayerCanvasVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
+simple VehicleMobility extends MovingMobilityBase
 {
     parameters:
-        @class(NetworkLayerCanvasVisualizer);
+        @class(VehicleMobility);
+        string waypointFile;
+        double waypointProximity @unit(m);
+        double speed @unit(mps);
+        double initialX @unit(m) = default(uniform(constraintAreaMinX, constraintAreaMaxX));
+        double initialY @unit(m) = default(uniform(constraintAreaMinY, constraintAreaMaxY));
+        double initialZ @unit(m) = default(uniform(constraintAreaMinZ, constraintAreaMaxZ));
+        bool initFromDisplayString = default(true);
 }

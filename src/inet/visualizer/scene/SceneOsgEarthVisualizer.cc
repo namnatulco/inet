@@ -53,19 +53,39 @@ void SceneOsgEarthVisualizer::initialize(int stage)
         if (par("displayPlayground"))
             initializePlayground();
         initializeViewpoint();
+        const char *convertGeographicLocationsToPlaygroundPositions = par("convertGeographicLocationsToPlaygroundPositions");
+        if (convertGeographicLocationsToPlaygroundPositions != nullptr) {
+            cStringTokenizer t1(convertGeographicLocationsToPlaygroundPositions, ";");
+            while (t1.hasMoreTokens()) {
+                const char *token = t1.nextToken();
+                cStringTokenizer t2(token, ",");
+                const char *name = t2.nextToken();
+                double latitude = atof(t2.nextToken());
+                double longitude = atof(t2.nextToken());
+                auto mapSrs = mapNode->getMapSRS();
+                osg::Vec3d ecefSrsPoint;
+                mapSrs->getGeographicSRS()->transform(osg::Vec3d(longitude, latitude, 0.0), mapSrs->getECEF(), ecefSrsPoint);
+                osg::Matrixd inverseLocatorMatrix;
+                inverseLocatorMatrix.invert(locatorMatrix);
+                auto playgroundPoint = osg::Vec4d(ecefSrsPoint.x(), ecefSrsPoint.y(), ecefSrsPoint.z(), 1.0) * inverseLocatorMatrix;
+                double x = playgroundPoint.x();
+                double y = playgroundPoint.y();
+                std::cout << "Converted " << name << " geographic location " << longitude << ", " << latitude << " to playground position " << x << ", " << y << endl;
+            }
+        }
     }
 }
 
 void SceneOsgEarthVisualizer::initializeScene()
 {
-    const char* sceneMapString = par("sceneMap");
-    auto sceneMap = osgDB::readNodeFile(sceneMapString);
-    if (sceneMap == nullptr)
-        throw cRuntimeError("Could not read earth map file '%s'", sceneMapString);
+    const char* mapFileString = par("mapFile");
+    auto mapScene = osgDB::readNodeFile(mapFileString);
+    if (mapScene == nullptr)
+        throw cRuntimeError("Could not read earth map file '%s'", mapFileString);
     auto osgCanvas = visualizerTargetModule->getOsgCanvas();
-    osgCanvas->setScene(sceneMap);
+    osgCanvas->setScene(mapScene);
     osgCanvas->setViewerStyle(cOsgCanvas::STYLE_EARTH);
-    mapNode = MapNode::findMapNode(sceneMap);
+    mapNode = MapNode::findMapNode(mapScene);
     if (mapNode == nullptr)
         throw cRuntimeError("Could not find map node");
     locatorNode = new osgEarth::Util::ObjectLocatorNode(mapNode->getMap());

@@ -22,6 +22,7 @@
 #include "inet/mobility/contract/IMobility.h"
 #include "inet/visualizer/linklayer/LinkLayerOsgVisualizer.h"
 #include <osg/Geode>
+#include <osg/LineWidth>
 
 namespace inet {
 
@@ -74,7 +75,7 @@ osg::Geode *LinkLayerOsgVisualizer::createLine(cModule *source, cModule *destina
     auto destinationMobility = check_and_cast<IMobility *>(getContainingNode(destination)->getSubmodule("mobility"));
     auto drawable = inet::osg::createLineGeometry(sourceMobility->getCurrentPosition(), destinationMobility->getCurrentPosition());
     geode->addDrawable(drawable);
-    auto stateSet = inet::osg::createStateSet(cFigure::BLACK, 1.0);
+    auto stateSet = inet::osg::createStateSet(cFigure::BLACK, 1.0, false);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
     geode->setStateSet(stateSet);
     return geode;

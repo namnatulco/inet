@@ -15,16 +15,23 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.networklayer;
+#include "inet/common/ModuleAccess.h"
+#include "inet/visualizer/base/StatisticVisualizerBase.h"
 
-import inet.visualizer.base.NetworkLayerVisualizerBase;
-import inet.visualizer.contract.INetworkLayerVisualizer;
+namespace inet {
 
-//
-// This module visualizes the network layer communication on a canvas.
-//
-simple NetworkLayerCanvasVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
+namespace visualizer {
+
+void StatisticVisualizerBase::initialize(int stage)
 {
-    parameters:
-        @class(NetworkLayerCanvasVisualizer);
+    VisualizerBase::initialize(stage);
+    if (!hasGUI()) return;
+    if (stage == INITSTAGE_LOCAL) {
+        statisticSubscriptionModule = *par("statisticSubscriptionModule").stringValue() == '\0' ? getSystemModule() : getModuleFromPar<cModule>(par("statisticSubscriptionModule"), this);
+    }
 }
+
+} // namespace visualizer
+
+} // namespace inet
+

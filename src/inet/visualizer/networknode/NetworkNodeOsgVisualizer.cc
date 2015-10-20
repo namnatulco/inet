@@ -51,6 +51,17 @@ void NetworkNodeOsgVisualizer::initialize(int stage)
 
 NetworkNodeVisualization* NetworkNodeOsgVisualizer::createNetworkNodeVisualization(cModule *module) const
 {
+    double labelSpacing = 2;
+    osgText::Text *label = nullptr;
+    if (displayModuleName) {
+        label = new osgText::Text();
+        label->setCharacterSize(18);
+        label->setBoundingBoxColor(osg::Vec4(1.0, 1.0, 1.0, 0.5));
+        label->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+        label->setAlignment(osgText::Text::CENTER_BOTTOM);
+        label->setText(module->getFullName());
+        label->setDrawMode(osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::TEXT);
+    }
     osg::Node *osgNode = nullptr;
     cDisplayString& displayString = module->getDisplayString();
     if (module->hasPar("osgModel") && strlen(module->par("osgModel")) != 0) {
@@ -58,18 +69,16 @@ NetworkNodeVisualization* NetworkNodeOsgVisualizer::createNetworkNodeVisualizati
         auto osgModel = osgDB::readNodeFile(osgModelString);
         if (osgModel == nullptr)
             throw cRuntimeError("Visual representation osg model '%s' not found", osgModel);
+        osgModel->setStateSet(inet::osg::createStateSet(cFigure::Color(203, 65, 84), 1.0, false));
         auto group = new osg::Group();
         group->addChild(osgModel);
         if (displayModuleName) {
-            auto boundingSphere = osgModel->getBound();
-            auto text = new osgText::Text();
-            text->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
-            text->setCharacterSize(18);
-            text->setText(module->getFullName());
-            text->setPosition(osg::Vec3(0.0, 0.0, 0.0));
+            label->setPosition(osg::Vec3(0.0, 0.0, labelSpacing));
             auto geode = new osg::Geode();
             geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
-            geode->addDrawable(text);
+            geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+            geode->addDrawable(label);
+            auto boundingSphere = osgModel->getBound();
             auto autoTransform = new osg::AutoTransform();
             // TODO: allow pivot point parameterization
             autoTransform->setPivotPoint(osg::Vec3d(0.0, 0.0, 0.0));
@@ -99,14 +108,11 @@ NetworkNodeVisualization* NetworkNodeOsgVisualizer::createNetworkNodeVisualizati
         geometry->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
         auto geode = new osg::Geode();
         geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+        geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
         geode->addDrawable(geometry);
         if (displayModuleName) {
-            auto text = new osgText::Text();
-            text->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
-            text->setCharacterSize(18);
-            text->setText(module->getFullName());
-            text->setPosition(osg::Vec3(0.0, image->t(), 0.0));
-            geode->addDrawable(text);
+            label->setPosition(osg::Vec3(0.0, image->t() + labelSpacing, 0.0));
+            geode->addDrawable(label);
         }
         auto autoTransform = new osg::AutoTransform();
         // TODO: allow pivot point parameterization
@@ -121,10 +127,10 @@ NetworkNodeVisualization* NetworkNodeOsgVisualizer::createNetworkNodeVisualizati
     auto objectNode = cOsgCanvas::createOmnetppObjectNode(module);
     objectNode->addChild(osgNode);
     auto positionAttitudeTransform = new NetworkNodeVisualization(objectNode);
-    positionAttitudeTransform->addChild(objectNode);
     double x = atol(displayString.getTagArg("p", 0));
     double y = atol(displayString.getTagArg("p", 1));
     positionAttitudeTransform->setPosition(osg::Vec3d(x, y, 0.0));
+    positionAttitudeTransform->addChild(objectNode);
     return positionAttitudeTransform;
 }
 

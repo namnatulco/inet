@@ -20,7 +20,7 @@ package inet.visualizer.networklayer;
 import inet.visualizer.contract.INetworkLayerVisualizer;
 
 //
-// This module integrates canvas and osg link layer visualizers into a single module.
+// This module integrates canvas and osg network layer visualizers into a single module.
 //
 module NetworkLayerVisualizer like INetworkLayerVisualizer
 {

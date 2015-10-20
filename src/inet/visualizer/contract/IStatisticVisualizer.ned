@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2013 OpenSim Ltd.
+// Copyright (C) OpenSim Ltd.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
@@ -15,16 +15,13 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.networklayer;
-
-import inet.visualizer.base.NetworkLayerVisualizerBase;
-import inet.visualizer.contract.INetworkLayerVisualizer;
+package inet.visualizer.contract;
 
 //
-// This module visualizes the network layer communication on a canvas.
+// This module interface allows configuring statistic visualizers from INI files.
 //
-simple NetworkLayerCanvasVisualizer extends NetworkLayerVisualizerBase like INetworkLayerVisualizer
+moduleinterface IStatisticVisualizer
 {
     parameters:
-        @class(NetworkLayerCanvasVisualizer);
+        @display("i=block/app_s");
 }

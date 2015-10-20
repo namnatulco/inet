@@ -15,42 +15,32 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __INET_SCENEOSGEARTHVISUALIZER_H
-#define __INET_SCENEOSGEARTHVISUALIZER_H
+#ifndef __INET_STATISTICOSGVISUALIZER_H
+#define __INET_STATISTICOSGVISUALIZER_H
 
-#include "inet/visualizer/base/SceneOsgVisualizerBase.h"
-#include <osgEarth/MapNode>
-#include <osgEarthAnnotation/RectangleNode>
-#include <osgEarthUtil/ObjectLocator>
+#include "inet/visualizer/base/StatisticVisualizerBase.h"
 
 namespace inet {
 
 namespace visualizer {
 
 /**
- * This class provides the visualization of the scene using osg earth.
+ * This class provides the visualization of the network layer communication.
  */
-class INET_API SceneOsgEarthVisualizer : public SceneOsgVisualizerBase
+class INET_API StatisticOsgVisualizer : public StatisticVisualizerBase
 {
 #ifdef WITH_OSG
 
   protected:
-    double playgroundLongitude = NaN;
-    double playgroundLatitude = NaN;
-    double playgroundOrientation = NaN;
-    double cameraDistanceFactor = NaN;
-
-    osgEarth::MapNode *mapNode = nullptr;
-    osgEarth::Util::ObjectLocatorNode *locatorNode = nullptr;
-    osg::Matrixd locatorMatrix;
-
-  protected:
     virtual void initialize(int stage) override;
-    virtual void initializeScene();
-    virtual void initializeViewpoint();
 
   public:
-    virtual osg::Group *getMainPart() override;
+    virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object) override;
+
+#else // ifdef WITH_OSG
+
+  public:
+    virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object) override {}
 
 #endif // ifdef WITH_OSG
 };
@@ -59,5 +49,5 @@ class INET_API SceneOsgEarthVisualizer : public SceneOsgVisualizerBase
 
 } // namespace inet
 
-#endif // ifndef __INET_SCENEOSGEARTHVISUALIZER_H
+#endif // ifndef __INET_STATISTICOSGVISUALIZER_H
 
