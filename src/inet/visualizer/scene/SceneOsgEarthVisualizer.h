@@ -49,6 +49,9 @@ class INET_API SceneOsgEarthVisualizer : public SceneOsgVisualizerBase
     virtual void initializeScene();
     virtual void initializeViewpoint();
 
+    virtual Coord computePlaygroundCoordinate(const osg::Vec3d& geographicCoordinate);
+    virtual osg::Vec3d computeGeographicCoordinate(const Coord& playgroundCoordinate);
+
   public:
     virtual osg::Group *getMainPart() override;
 

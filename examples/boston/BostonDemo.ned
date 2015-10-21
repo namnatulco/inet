@@ -56,7 +56,7 @@ network BostonDemo
             parameters:
                 @display("p=300,200");
         }
-        client[1]: WirelessHost {
+        client[2]: WirelessHost {
             parameters:
                 @display("p=300,300");
         }

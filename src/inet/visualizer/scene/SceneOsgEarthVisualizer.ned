@@ -31,5 +31,5 @@ simple SceneOsgEarthVisualizer extends SceneOsgVisualizerBase like ISceneVisuali
         double playgroundLongitude; // geographic position of the playground origin
         double playgroundLatitude; // geographic position of the playground origin
         double playgroundOrientation @unit(deg); // orientation of the playground
-        string convertGeographicLocationsToPlaygroundPositions = default(""); // list of name, latitude, longitude tuples separated by semicolons
+//        string convertGeographicLocationsToPlaygroundPositions = default(""); // list of name, latitude, longitude tuples separated by semicolons
 }
