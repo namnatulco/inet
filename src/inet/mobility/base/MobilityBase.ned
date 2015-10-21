@@ -29,6 +29,7 @@ simple MobilityBase like IMobility
     parameters:
         @signal[mobilityStateChanged](type=MobilityBase);
         @display("i=block/cogwheel");
+        string coordinateSystemModule = default(""); // module path of the geographic coordinate system module
         bool visualizeMobility = default(true); // false means this mobility module does no visualization
         string visualRepresentation = default("^"); // determines the module that is moved by this mobility
         string networkNodeVisualizerModule = default("visualizer.osgVisualizer.networkNodeVisualizer");

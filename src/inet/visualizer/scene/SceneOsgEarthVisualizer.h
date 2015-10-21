@@ -18,6 +18,7 @@
 #ifndef __INET_SCENEOSGEARTHVISUALIZER_H
 #define __INET_SCENEOSGEARTHVISUALIZER_H
 
+#include "inet/common/geometry/common/CoordinateSystem.h"
 #include "inet/visualizer/base/SceneOsgVisualizerBase.h"
 #include <osgEarth/MapNode>
 #include <osgEarthAnnotation/RectangleNode>
@@ -35,22 +36,17 @@ class INET_API SceneOsgEarthVisualizer : public SceneOsgVisualizerBase
 #ifdef WITH_OSG
 
   protected:
-    double playgroundLongitude = NaN;
-    double playgroundLatitude = NaN;
-    double playgroundOrientation = NaN;
+    IGeographicCoordinateSystem *coordinateSystem = nullptr;
     double cameraDistanceFactor = NaN;
 
     osgEarth::MapNode *mapNode = nullptr;
     osgEarth::Util::ObjectLocatorNode *locatorNode = nullptr;
-    osg::Matrixd locatorMatrix;
+    double playgroundOrientation;
 
   protected:
     virtual void initialize(int stage) override;
     virtual void initializeScene();
     virtual void initializeViewpoint();
-
-    virtual Coord computePlaygroundCoordinate(const osg::Vec3d& geographicCoordinate);
-    virtual osg::Vec3d computeGeographicCoordinate(const Coord& playgroundCoordinate);
 
   public:
     virtual osg::Group *getMainPart() override;

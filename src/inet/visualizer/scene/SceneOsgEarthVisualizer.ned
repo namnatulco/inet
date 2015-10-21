@@ -27,9 +27,6 @@ simple SceneOsgEarthVisualizer extends SceneOsgVisualizerBase like ISceneVisuali
 {
     parameters:
         @class(SceneOsgEarthVisualizer);
+        string coordinateSystemModule = default("coordinateSystem"); // module path of the geographic coordinate system
         string mapFile; // map file, e.g. some part of the earth
-        double playgroundLongitude; // geographic position of the playground origin
-        double playgroundLatitude; // geographic position of the playground origin
-        double playgroundOrientation @unit(deg); // orientation of the playground
-//        string convertGeographicLocationsToPlaygroundPositions = default(""); // list of name, latitude, longitude tuples separated by semicolons
 }

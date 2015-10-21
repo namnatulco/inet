@@ -1,8 +1,4 @@
 <environment>
-
-
-
-    <object position="min 104.28 11.7926 0" orientation="0 0 0" shape="prism 10 104.28 11.7926 134.553 12.1594 147.498 166.968 117.528 171.268" material="brick" fill-color="203 65 84" opacity="0.3"/>
-    <object position="min 140.353 11.7134 0" orientation="0 0 0" shape="prism 10 140.353 11.7134 194.223 11.2916 208.607 161.006 152.988 166.645" material="brick" fill-color="203 65 84" opacity="0.3"/>
-    <object position="min 128 36 0" orientation="0 0 0" shape="prism 10 0 0 50 0 77 290 26 275" material="forest" fill-color="160 228 160" opacity="0.3"/>
+    <object position="min 42.35667 -71.06962 0" orientation="0 0 0" shape="prism 10 42.35667 -71.06962 42.35627 -71.06941 42.35663 -71.06770 42.35705 -71.06785" material="brick" fill-color="203 65 84" opacity="0.3"/>
+<!--<object position="min 128 36 0" orientation="0 0 0" shape="prism 10 0 0 50 0 77 290 26 275" material="forest" fill-color="160 228 160" opacity="0.3"/>-->
 </environment>

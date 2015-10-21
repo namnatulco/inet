@@ -40,7 +40,7 @@ class INET_API VehicleMobility : public MovingMobilityBase
 
     double speed;
     double heading;
-    double  wayponitProximity;
+    double waypointProximity;
     double angularSpeed;
     int targetPointIndex;
 

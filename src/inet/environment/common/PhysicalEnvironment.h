@@ -18,14 +18,15 @@
 #ifndef __INET_PHYSICALENVIRONMENT_H
 #define __INET_PHYSICALENVIRONMENT_H
 
-#include "inet/common/IVisitor.h"
 #include "inet/common/geometry/base/ShapeBase.h"
-#include "inet/common/geometry/object/LineSegment.h"
+#include "inet/common/geometry/common/CoordinateSystem.h"
 #include "inet/common/geometry/common/Rotation.h"
-#include "inet/environment/contract/IPhysicalEnvironment.h"
-#include "inet/environment/contract/IObjectCache.h"
-#include "inet/environment/common/PhysicalObject.h"
+#include "inet/common/geometry/object/LineSegment.h"
+#include "inet/common/IVisitor.h"
 #include "inet/environment/common/MaterialRegistry.h"
+#include "inet/environment/common/PhysicalObject.h"
+#include "inet/environment/contract/IObjectCache.h"
+#include "inet/environment/contract/IPhysicalEnvironment.h"
 
 namespace inet {
 
@@ -44,6 +45,7 @@ class INET_API PhysicalEnvironment : public cModule, public IPhysicalEnvironment
   protected:
     /** @name Parameters */
     //@{
+    IGeographicCoordinateSystem *coordinateSystem = nullptr;
     K temperature;
     Coord spaceMin;
     Coord spaceMax;

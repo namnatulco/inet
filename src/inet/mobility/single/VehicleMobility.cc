@@ -15,6 +15,7 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "inet/common/geometry/common/CoordinateSystem.h"
 #include "inet/mobility/single/VehicleMobility.h"
 #include <fstream>
 #include <iostream>
@@ -30,7 +31,7 @@ void VehicleMobility::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         readWaypointsFromFile(par("waypointFile"));
         speed = par("speed");
-        wayponitProximity = par("waypointProximity");
+        waypointProximity = par("waypointProximity");
         targetPointIndex = 0;
         heading = 0;
         angularSpeed = 0;
@@ -47,14 +48,27 @@ void VehicleMobility::setInitialPosition()
 
 void VehicleMobility::readWaypointsFromFile(const char *fileName)
 {
+    auto coordinateSystem = getModuleFromPar<IGeographicCoordinateSystem>(par("coordinateSystemModule"), this);
     char line[256];
     std::ifstream inputFile(fileName);
     while (true) {
         inputFile.getline(line, 256);
         if (!inputFile.fail()) {
-            cStringTokenizer tokenizer(line);
-            double x = atof(tokenizer.nextToken());
-            double y = atof(tokenizer.nextToken());
+            cStringTokenizer tokenizer(line, ",");
+            Coord playgroundCoordinate;
+            double value1 = atof(tokenizer.nextToken());
+            double value2 = atof(tokenizer.nextToken());
+            double x;
+            double y;
+            if (coordinateSystem == nullptr) {
+                x = value1;
+                y = value2;
+            }
+            else {
+                Coord playgroundCoordinate = coordinateSystem->computePlaygroundCoordinate(Coord(value2, value1, 0));
+                x = playgroundCoordinate.x;
+                y = playgroundCoordinate.y;
+            }
             waypoints.push_back(Waypoint(x, y, 0.0));
         }
         else
@@ -67,8 +81,8 @@ void VehicleMobility::move()
     Waypoint target = waypoints[targetPointIndex];
     double dx = target.x - lastPosition.x;
     double dy = target.y - lastPosition.y;
-    if (dx*dx + dy*dy < wayponitProximity*wayponitProximity)  // reached so change to next (within the predefined proximity of the waypoint)
-        targetPointIndex = (targetPointIndex+1) % waypoints.size();
+    if (dx * dx + dy * dy < waypointProximity * waypointProximity)  // reached so change to next (within the predefined proximity of the waypoint)
+        targetPointIndex = (targetPointIndex + 1) % waypoints.size();
     double targetDirection = atan2(dy, dx) / M_PI * 180;
     double diff = targetDirection - heading;
     while (diff < -180)

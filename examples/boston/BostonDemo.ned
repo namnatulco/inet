@@ -18,6 +18,7 @@
 
 package inet.examples.boston;
 
+import inet.common.geometry.common.OsgGeographicCoordinateSystem;
 import inet.environment.common.PhysicalEnvironment;
 import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
 import inet.node.ethernet.Eth1G;
@@ -32,21 +33,25 @@ network BostonDemo
     parameters:
         @display("bgb=0,0");
     submodules:
-        visualizer: IntegratedVisualizer {
+        coordinateSystem: OsgGeographicCoordinateSystem {
             parameters:
                 @display("p=100,50");
         }
-        physicalEnvironment: PhysicalEnvironment {
+        visualizer: IntegratedVisualizer {
             parameters:
                 @display("p=100,150");
         }
-        configurator: IPv4NetworkConfigurator {
+        physicalEnvironment: PhysicalEnvironment {
             parameters:
                 @display("p=100,250");
         }
-        radioMedium: Ieee80211ScalarRadioMedium {
+        configurator: IPv4NetworkConfigurator {
             parameters:
                 @display("p=100,350");
+        }
+        radioMedium: Ieee80211ScalarRadioMedium {
+            parameters:
+                @display("p=100,450");
         }
         server: StandardHost {
             parameters:

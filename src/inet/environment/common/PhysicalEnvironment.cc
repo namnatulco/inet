@@ -15,13 +15,14 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "inet/environment/common/PhysicalEnvironment.h"
+#include "inet/common/geometry/common/Rotation.h"
 #include "inet/common/geometry/object/Box.h"
 #include "inet/common/geometry/shape/Cuboid.h"
-#include "inet/common/geometry/shape/Sphere.h"
-#include "inet/common/geometry/shape/Prism.h"
 #include "inet/common/geometry/shape/polyhedron/Polyhedron.h"
-#include "inet/common/geometry/common/Rotation.h"
+#include "inet/common/geometry/shape/Prism.h"
+#include "inet/common/geometry/shape/Sphere.h"
+#include "inet/common/ModuleAccess.h"
+#include "inet/environment/common/PhysicalEnvironment.h"
 
 namespace inet {
 
@@ -51,6 +52,7 @@ void PhysicalEnvironment::initialize(int stage)
 {
     if (stage == INITSTAGE_LOCAL)
     {
+        coordinateSystem = getModuleFromPar<IGeographicCoordinateSystem>(par("coordinateSystemModule"), this);
         objectCache = dynamic_cast<IObjectCache *>(getSubmodule("objectCache"));
         temperature = K(par("temperature"));
         spaceMin.x = par("spaceMinX");
@@ -133,6 +135,12 @@ void PhysicalEnvironment::parseShapes(cXMLElement *xml)
                 if ((tok = tokenizer.nextToken()) == nullptr)
                     throw cRuntimeError("Missing prism y at %s", element->getSourceLocation());
                 point.y = atof(tok);
+                if (coordinateSystem != nullptr) {
+                    double x = point.x;
+                    point.x = point.y;
+                    point.y = x;
+                    point = coordinateSystem->computePlaygroundCoordinate(point);
+                }
                 points.push_back(point);
             }
             if (points.size() < 3)
@@ -289,6 +297,13 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
                 if ((tok = shapeTokenizer.nextToken()) == nullptr)
                     throw cRuntimeError("Missing prism y at %s", element->getSourceLocation());
                 point.y = atof(tok);
+                if (coordinateSystem != nullptr) {
+                    double x = point.x;
+                    point.x = point.y;
+                    point.y = x;
+                    point = coordinateSystem->computePlaygroundCoordinate(point);
+                    point.z = 0;
+                }
                 points.push_back(point);
             }
             if (points.size() < 3)
@@ -341,25 +356,33 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
         {
             cStringTokenizer tokenizer(positionAttribute);
             const char *kind = tokenizer.nextToken();
+            if ((tok = tokenizer.nextToken()) == nullptr)
+                throw cRuntimeError("Missing position x at %s", element->getSourceLocation());
+            position.x = atof(tok);
+            if ((tok = tokenizer.nextToken()) == nullptr)
+                throw cRuntimeError("Missing position y at %s", element->getSourceLocation());
+            position.y = atof(tok);
+            if ((tok = tokenizer.nextToken()) == nullptr)
+                throw cRuntimeError("Missing position z at %s", element->getSourceLocation());
+            position.z = atof(tok);
+            if (coordinateSystem != nullptr) {
+                double x = position.x;
+                double z = position.z;
+                position.x = position.y;
+                position.y = x;
+                position = coordinateSystem->computePlaygroundCoordinate(position);
+                position.z = z;
+            }
             if (!kind)
                 throw cRuntimeError("Missing position kind");
             else if (!strcmp(kind, "min"))
-                position = size / 2;
+                position += size / 2;
             else if (!strcmp(kind, "max"))
-                position = size / -2;
+                position -= size / 2;
             else if (!strcmp(kind, "center"))
-                position = Coord::ZERO;
+                position += Coord::ZERO;
             else
                 throw cRuntimeError("Unknown position kind");
-            if ((tok = tokenizer.nextToken()) == nullptr)
-                throw cRuntimeError("Missing position x at %s", element->getSourceLocation());
-            position.x += atof(tok);
-            if ((tok = tokenizer.nextToken()) == nullptr)
-                throw cRuntimeError("Missing position y at %s", element->getSourceLocation());
-            position.y += atof(tok);
-            if ((tok = tokenizer.nextToken()) == nullptr)
-                throw cRuntimeError("Missing position z at %s", element->getSourceLocation());
-            position.z += atof(tok);
         }
         // material
         const Material *material;
