@@ -25,8 +25,8 @@ simple SimpleGeographicCoordinateSystem like IGeographicCoordinateSystem
 {
     parameters:
         @display("i=block/table2_s");
-        double playgroundLongitude @unit(deg);
         double playgroundLatitude @unit(deg);
+        double playgroundLongitude @unit(deg);
         double playgroundAltitude @unit(m) = default(0m);
 }
 
@@ -34,8 +34,8 @@ simple OsgGeographicCoordinateSystem like IGeographicCoordinateSystem
 {
     parameters:
         @display("i=block/table2_s");
-        double playgroundLongitude @unit(deg);
         double playgroundLatitude @unit(deg);
+        double playgroundLongitude @unit(deg);
         double playgroundAltitude @unit(m) = default(0m);
         double playgroundOrientation @unit(deg) = default(0deg);
 }

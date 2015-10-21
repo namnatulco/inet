@@ -25,8 +25,8 @@ Define_Module(SimpleGeographicCoordinateSystem);
 void SimpleGeographicCoordinateSystem::initialize(int stage)
 {
     if (stage == INITSTAGE_LOCAL) {
-        playgroundLongitude = par("playgroundLongitude");
         playgroundLatitude = par("playgroundLatitude");
+        playgroundLongitude = par("playgroundLongitude");
     }
 }
 
@@ -39,8 +39,8 @@ Coord SimpleGeographicCoordinateSystem::computePlaygroundCoordinate(const Coord&
 
 Coord SimpleGeographicCoordinateSystem::computeGeographicCoordinate(const Coord& playgroundCoordinate)
 {
-    double geograpicLongitude = playgroundLongitude + playgroundCoordinate.x / metersPerDegree / cos(fabs(playgroundLatitude / 180 * M_PI));
     double geograpicLatitude = playgroundLatitude - playgroundCoordinate.y / metersPerDegree;
+    double geograpicLongitude = playgroundLongitude + playgroundCoordinate.x / metersPerDegree / cos(fabs(playgroundLatitude / 180 * M_PI));
     return Coord(geograpicLongitude, geograpicLatitude, playgroundCoordinate.z - playgroundAltitude);
 }
 
@@ -52,8 +52,8 @@ void OsgGeographicCoordinateSystem::initialize(int stage)
         // TODO: lookup map node
         auto mapScene = osgDB::readNodeFile("boston.earth");
         mapNode = osgEarth::MapNode::findMapNode(mapScene);
-        double playgroundLongitude = par("playgroundLongitude");
         double playgroundLatitude = par("playgroundLatitude");
+        double playgroundLongitude = par("playgroundLongitude");
         double playgroundAltitude = par("playgroundAltitude");
         double playgroundOrientation = par("playgroundOrientation");
         auto locatorNode = new osgEarth::Util::ObjectLocatorNode(mapNode->getMap());

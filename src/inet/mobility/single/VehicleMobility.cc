@@ -48,7 +48,7 @@ void VehicleMobility::setInitialPosition()
 
 void VehicleMobility::readWaypointsFromFile(const char *fileName)
 {
-    auto coordinateSystem = getModuleFromPar<IGeographicCoordinateSystem>(par("coordinateSystemModule"), this);
+    auto coordinateSystem = getModuleFromPar<IGeographicCoordinateSystem>(par("coordinateSystemModule"), this, false);
     char line[256];
     std::ifstream inputFile(fileName);
     while (true) {

@@ -68,6 +68,7 @@ void SceneOsgEarthVisualizer::initializeScene()
         throw cRuntimeError("Could not find map node");
     auto geographicOrigin = coordinateSystem->computeGeographicCoordinate(Coord::ZERO);
     auto unitVector = coordinateSystem->computeGeographicCoordinate(Coord(1.0, 0.0, 0.0));
+    // TODO: for some reason it just doesn't work
     playgroundOrientation = 68.3; //atan2(unitVector.y, unitVector.x) * 180 / M_PI;
     locatorNode = new osgEarth::Util::ObjectLocatorNode(mapNode->getMap());
     locatorNode->getLocator()->setPosition(osg::Vec3d(geographicOrigin.x, geographicOrigin.y, geographicOrigin.z));

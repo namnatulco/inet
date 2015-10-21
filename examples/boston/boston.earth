@@ -20,6 +20,7 @@ to extruded buildings.
         <profile>spherical-mercator</profile>
     </image>
 
+<!--
     <model name="buildings" driver="feature_geom">
         <features name="buildings" driver="ogr">
             <url>data/boston_buildings_utm19.shp</url>
@@ -63,6 +64,7 @@ to extruded buildings.
             </style>
         </styles>
     </model>
+-->
 
     <external>
         <viewpoints>

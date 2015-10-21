@@ -34,8 +34,8 @@ class INET_API SimpleGeographicCoordinateSystem : public cSimpleModule, public I
 {
   protected:
     double metersPerDegree = 111320;
-    double playgroundLongitude = NaN;
     double playgroundLatitude = NaN;
+    double playgroundLongitude = NaN;
     double playgroundAltitude = NaN;
 
   protected:
