@@ -6,13 +6,15 @@
   </inputs>
   <datasets>
     <datasets name="throughput">
-      <items xsi:type="scave:Add" filterPattern="&quot;rcvdPk:vector(packetBytes)&quot;" type="VECTOR"/>
+      <items xsi:type="scave:Add" filterPattern="module(*udpApp*) AND &quot;rcvdPk:vector(packetBytes)&quot;" type="VECTOR"/>
       <items xsi:type="scave:Apply" operation="sum"/>
       <items xsi:type="scave:Apply" operation="diffquot"/>
       <items xsi:type="scave:Apply" operation="slidingwinavg">
-        <params name="windowSize" value="10"/>
+        <params name="windowSize" value="1000"/>
       </items>
-      <items xsi:type="scave:LineChart" name="throughput" lineNameFormat=""/>
+      <items xsi:type="scave:LineChart" name="throughput" lineNameFormat="">
+        <properties name="Line.Type" value="Linear"/>
+      </items>
     </datasets>
   </datasets>
   <chartSheets>

@@ -116,7 +116,7 @@ void MobilityBase::setInitialPosition()
         filled = true;
     }
     else if (coordinateSystem != nullptr && hasPar("initialLatitude") && hasPar("initialLongitude") && hasPar("initialAltitude")) {
-        lastPosition = coordinateSystem->computePlaygroundCoordinate(Coord(par("initialLongitude"), par("initialLatitude"), par("initialAltitude")));
+        lastPosition = coordinateSystem->computePlaygroundCoordinate(GeoCoord(par("initialLatitude"), par("initialLongitude"), par("initialAltitude")));
         filled = true;
     }
     if (!filled)

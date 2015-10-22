@@ -71,6 +71,7 @@ class INET_API PhysicalEnvironment : public cModule, public IPhysicalEnvironment
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;
 
+    virtual void convertPoints(std::vector<Coord>& points);
     virtual void parseShapes(cXMLElement *xml);
     virtual void parseMaterials(cXMLElement *xml);
     virtual void parseObjects(cXMLElement *xml);

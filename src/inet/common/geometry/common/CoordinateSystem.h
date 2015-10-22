@@ -23,11 +23,25 @@
 
 namespace inet {
 
+class INET_API GeoCoord
+{
+  public:
+    /** @name latitude, longitude and altitude coordinate of the position. */
+    /*@{*/
+    double latitude;
+    double longitude;
+    double altitude;
+    /*@}*/
+
+  public:
+    GeoCoord(double latitude, double longitude, double altitude) : latitude(latitude), longitude(longitude), altitude(altitude) { }
+};
+
 class INET_API IGeographicCoordinateSystem
 {
   public:
-    virtual Coord computePlaygroundCoordinate(const Coord& geographicCoordinate) = 0;
-    virtual Coord computeGeographicCoordinate(const Coord& playgroundCoordinate) = 0;
+    virtual Coord computePlaygroundCoordinate(const GeoCoord& geographicCoordinate) = 0;
+    virtual GeoCoord computeGeographicCoordinate(const Coord& playgroundCoordinate) = 0;
 };
 
 class INET_API SimpleGeographicCoordinateSystem : public cSimpleModule, public IGeographicCoordinateSystem
@@ -42,8 +56,8 @@ class INET_API SimpleGeographicCoordinateSystem : public cSimpleModule, public I
     virtual void initialize(int stage) override;
 
   public:
-    virtual Coord computePlaygroundCoordinate(const Coord& geographicCoordinate);
-    virtual Coord computeGeographicCoordinate(const Coord& playgroundCoordinate);
+    virtual Coord computePlaygroundCoordinate(const GeoCoord& geographicCoordinate);
+    virtual GeoCoord computeGeographicCoordinate(const Coord& playgroundCoordinate);
 };
 
 
@@ -58,8 +72,8 @@ class INET_API OsgGeographicCoordinateSystem : public cSimpleModule, public IGeo
     virtual void initialize(int stage) override;
 
   public:
-    virtual Coord computePlaygroundCoordinate(const Coord& geographicCoordinate);
-    virtual Coord computeGeographicCoordinate(const Coord& playgroundCoordinate);
+    virtual Coord computePlaygroundCoordinate(const GeoCoord& geographicCoordinate);
+    virtual GeoCoord computeGeographicCoordinate(const Coord& playgroundCoordinate);
 };
 
 } // namespace inet

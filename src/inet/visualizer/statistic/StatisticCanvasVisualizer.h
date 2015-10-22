@@ -15,14 +15,30 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.base;
+#ifndef __INET_STATISTICCANVASVISUALIZER_H
+#define __INET_STATISTICCANVASVISUALIZER_H
 
-//
-// This is a base module for statistic visualizer simple modules.
-//
-simple StatisticVisualizerBase extends VisualizerBase
+#include "inet/visualizer/base/StatisticVisualizerBase.h"
+
+namespace inet {
+
+namespace visualizer {
+
+/**
+ * This class provides the visualization of statistics.
+ */
+class INET_API StatisticCanvasVisualizer : public StatisticVisualizerBase
 {
-    parameters:
-        string statisticSubscriptionModule = default(""); // specifies the module path where the visualizer subscribes for the statistic
-        string statisticNameFilter = default("*"); // specifies which statistics are displayed
-}
+  protected:
+    virtual void initialize(int stage) override;
+
+  public:
+    virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object) override;
+};
+
+} // namespace visualizer
+
+} // namespace inet
+
+#endif // ifndef __INET_STATISTICCANVASVISUALIZER_H
+

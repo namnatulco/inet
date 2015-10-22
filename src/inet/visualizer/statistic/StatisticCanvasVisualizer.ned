@@ -15,14 +15,16 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-package inet.visualizer.base;
+package inet.visualizer.statistic;
+
+import inet.visualizer.base.StatisticVisualizerBase;
+import inet.visualizer.contract.IStatisticVisualizer;
 
 //
-// This is a base module for statistic visualizer simple modules.
+// This module visualizes statistics on a canvas.
 //
-simple StatisticVisualizerBase extends VisualizerBase
+simple StatisticCanvasVisualizer extends StatisticVisualizerBase like IStatisticVisualizer
 {
     parameters:
-        string statisticSubscriptionModule = default(""); // specifies the module path where the visualizer subscribes for the statistic
-        string statisticNameFilter = default("*"); // specifies which statistics are displayed
+        @class(StatisticCanvasVisualizer);
 }

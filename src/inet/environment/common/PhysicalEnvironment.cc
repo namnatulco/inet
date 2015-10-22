@@ -71,6 +71,18 @@ void PhysicalEnvironment::initialize(int stage)
     }
 }
 
+void PhysicalEnvironment::convertPoints(std::vector<Coord>& points)
+{
+    auto originPosition = coordinateSystem == nullptr ? GeoCoord(0, 0, 0) : coordinateSystem->computeGeographicCoordinate(Coord::ZERO);
+    Box boundingBox = Box::computeBoundingBox(points);
+    Coord center = boundingBox.getCenter();
+    for (auto & point : points) {
+        point -= center;
+        if (coordinateSystem != nullptr)
+            point = coordinateSystem->computePlaygroundCoordinate(GeoCoord(point.x + originPosition.latitude, point.y + originPosition.longitude, 0));
+    }
+}
+
 void PhysicalEnvironment::parseShapes(cXMLElement *xml)
 {
     cXMLElementList children = xml->getChildrenByTagName("shape");
@@ -126,7 +138,6 @@ void PhysicalEnvironment::parseShapes(cXMLElement *xml)
             const char *pointsAttribute = element->getAttribute("points");
             if (!pointsAttribute)
                 throw cRuntimeError("Missing points attribute of prism");
-
             cStringTokenizer tokenizer(pointsAttribute);
             while (tokenizer.hasMoreTokens())
             {
@@ -135,16 +146,12 @@ void PhysicalEnvironment::parseShapes(cXMLElement *xml)
                 if ((tok = tokenizer.nextToken()) == nullptr)
                     throw cRuntimeError("Missing prism y at %s", element->getSourceLocation());
                 point.y = atof(tok);
-                if (coordinateSystem != nullptr) {
-                    double x = point.x;
-                    point.x = point.y;
-                    point.y = x;
-                    point = coordinateSystem->computePlaygroundCoordinate(point);
-                }
+                point.z = -height / 2;
                 points.push_back(point);
             }
             if (points.size() < 3)
                 throw cRuntimeError("prism needs at least three points at %s", element->getSourceLocation());
+            convertPoints(points);
             shape = new Prism(height, Polygon(points));
         }
         else if (!strcmp(typeAttribute, "polyhedron"))
@@ -153,7 +160,6 @@ void PhysicalEnvironment::parseShapes(cXMLElement *xml)
             const char *pointsAttribute = element->getAttribute("points");
             if (!pointsAttribute)
                 throw cRuntimeError("Missing points attribute of polyhedron");
-
             cStringTokenizer tokenizer(pointsAttribute);
             while (tokenizer.hasMoreTokens())
             {
@@ -169,6 +175,7 @@ void PhysicalEnvironment::parseShapes(cXMLElement *xml)
             }
             if (points.size() < 4)
                 throw cRuntimeError("polyhedron needs at least four points at %s", element->getSourceLocation());
+            convertPoints(points);
             shape = new Polyhedron(points);
         }
         else
@@ -254,6 +261,7 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
             orientation.gamma = math::deg2rad(atof(tok));
         }
         // shape
+        Coord size = Coord::NIL;
         const ShapeBase *shape = nullptr;
         const char *shapeAttribute = element->getAttribute("shape");
         if (!shapeAttribute)
@@ -262,7 +270,6 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
         const char *shapeType = shapeTokenizer.nextToken();
         if (!strcmp(shapeType, "cuboid"))
         {
-            Coord size;
             if ((tok = shapeTokenizer.nextToken()) == nullptr)
                 throw cRuntimeError("Missing cuboid x at %s", element->getSourceLocation());
             size.x = atof(tok);
@@ -281,6 +288,7 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
                 throw cRuntimeError("Missing sphere radius at %s", element->getSourceLocation());
             double radius = atof(tok);
             shape = new Sphere(radius);
+            size = Coord(radius, radius, radius) * 2;
             shapes.push_back(shape);
         }
         else if (!strcmp(shapeType, "prism"))
@@ -297,24 +305,14 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
                 if ((tok = shapeTokenizer.nextToken()) == nullptr)
                     throw cRuntimeError("Missing prism y at %s", element->getSourceLocation());
                 point.y = atof(tok);
-                if (coordinateSystem != nullptr) {
-                    double x = point.x;
-                    point.x = point.y;
-                    point.y = x;
-                    point = coordinateSystem->computePlaygroundCoordinate(point);
-                    point.z = 0;
-                }
+                point.z = -height / 2;
                 points.push_back(point);
             }
             if (points.size() < 3)
                 throw cRuntimeError("prism needs at least three points at %s", element->getSourceLocation());
-            Box boundingBox = Box::computeBoundingBox(points);
-            Coord center = (boundingBox.getMax() - boundingBox.getMin()) / 2 + boundingBox.getMin();
-            center.z = height / 2;
-            std::vector<Coord> prismPoints;
-            for (auto & point : points)
-                prismPoints.push_back(point - center);
-            shape = new Prism(height, Polygon(prismPoints));
+            size = Box::computeBoundingBox(points).getSize();
+            convertPoints(points);
+            shape = new Prism(height, Polygon(points));
             shapes.push_back(shape);
         }
         else if (!strcmp(shapeType, "polyhedron"))
@@ -334,12 +332,9 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
             }
             if (points.size() < 4)
                 throw cRuntimeError("polyhedron needs at least four points at %s", element->getSourceLocation());
-            Box boundingBox = Box::computeBoundingBox(points);
-            Coord center = (boundingBox.getMax() - boundingBox.getMin()) / 2 + boundingBox.getMin();
-            std::vector<Coord> PolyhedronPoints;
-            for (auto & point : points)
-                PolyhedronPoints.push_back(point - center);
-            shape = new Polyhedron(PolyhedronPoints);
+            size = Box::computeBoundingBox(points).getSize();
+            convertPoints(points);
+            shape = new Polyhedron(points);
             shapes.push_back(shape);
         }
         else {
@@ -348,7 +343,6 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
         }
         if (!shape)
             throw cRuntimeError("Unknown shape '%s'", shapeAttribute);
-        const Coord size = shape->computeBoundingBoxSize();
         // position
         Coord position = Coord::NIL;
         const char *positionAttribute = element->getAttribute("position");
@@ -356,6 +350,8 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
         {
             cStringTokenizer tokenizer(positionAttribute);
             const char *kind = tokenizer.nextToken();
+            if (!kind)
+                throw cRuntimeError("Missing position kind");
             if ((tok = tokenizer.nextToken()) == nullptr)
                 throw cRuntimeError("Missing position x at %s", element->getSourceLocation());
             position.x = atof(tok);
@@ -365,17 +361,7 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
             if ((tok = tokenizer.nextToken()) == nullptr)
                 throw cRuntimeError("Missing position z at %s", element->getSourceLocation());
             position.z = atof(tok);
-            if (coordinateSystem != nullptr) {
-                double x = position.x;
-                double z = position.z;
-                position.x = position.y;
-                position.y = x;
-                position = coordinateSystem->computePlaygroundCoordinate(position);
-                position.z = z;
-            }
-            if (!kind)
-                throw cRuntimeError("Missing position kind");
-            else if (!strcmp(kind, "min"))
+            if (!strcmp(kind, "min"))
                 position += size / 2;
             else if (!strcmp(kind, "max"))
                 position -= size / 2;
@@ -383,6 +369,11 @@ void PhysicalEnvironment::parseObjects(cXMLElement *xml)
                 position += Coord::ZERO;
             else
                 throw cRuntimeError("Unknown position kind");
+            if (coordinateSystem != nullptr) {
+                auto convertedPosition = coordinateSystem->computePlaygroundCoordinate(GeoCoord(position.x, position.y, 0));
+                position.x = convertedPosition.x;
+                position.y = convertedPosition.y;
+            }
         }
         // material
         const Material *material;

@@ -71,7 +71,7 @@ void SceneOsgEarthVisualizer::initializeScene()
     // TODO: for some reason it just doesn't work
     playgroundOrientation = 68.3; //atan2(unitVector.y, unitVector.x) * 180 / M_PI;
     locatorNode = new osgEarth::Util::ObjectLocatorNode(mapNode->getMap());
-    locatorNode->getLocator()->setPosition(osg::Vec3d(geographicOrigin.x, geographicOrigin.y, geographicOrigin.z));
+    locatorNode->getLocator()->setPosition(osg::Vec3d(geographicOrigin.longitude, geographicOrigin.latitude, geographicOrigin.altitude));
     locatorNode->getLocator()->setOrientation(osg::Vec3d(playgroundOrientation, 0.0, 0.0));
     mapNode->getModelLayerGroup()->addChild(locatorNode);
 }
@@ -84,7 +84,7 @@ void SceneOsgEarthVisualizer::initializeViewpoint()
     auto geographicSrsEye = coordinateSystem->computeGeographicCoordinate(Coord(euclideanCenter.x() + radius, euclideanCenter.y() + radius, euclideanCenter.z() + radius));
     auto mapSrs = mapNode->getMapSRS();
     auto osgCanvas = visualizerTargetModule->getOsgCanvas();
-    osgCanvas->setEarthViewpoint(osgEarth::Viewpoint(geographicSrsEye.x, geographicSrsEye.y, geographicSrsEye.z, playgroundOrientation - 135, -45, cameraDistanceFactor * radius, mapSrs->getGeographicSRS()));
+    osgCanvas->setEarthViewpoint(osgEarth::Viewpoint(geographicSrsEye.longitude, geographicSrsEye.latitude, geographicSrsEye.altitude, playgroundOrientation - 135, -45, cameraDistanceFactor * radius, mapSrs->getGeographicSRS()));
 }
 
 osg::Group *SceneOsgEarthVisualizer::getMainPart()

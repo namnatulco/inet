@@ -31,7 +31,7 @@ class INET_API LinkLayerVisualizerBase : public VisualizerBase, public cListener
     /** @name Parameters */
     //@{
     cModule *linkLayerSubscriptionModule = nullptr;
-    inet::PatternMatcher packetNameMatcher;
+    PatternMatcher packetNameMatcher;
     //@}
 
   protected:

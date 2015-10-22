@@ -19,6 +19,7 @@
 #define __INET_STATISTICOSGVISUALIZER_H
 
 #include "inet/visualizer/base/StatisticVisualizerBase.h"
+#include <osg/Node>
 
 namespace inet {
 
@@ -30,6 +31,8 @@ namespace visualizer {
 class INET_API StatisticOsgVisualizer : public StatisticVisualizerBase
 {
 #ifdef WITH_OSG
+  protected:
+    std::map<std::pair<int, int>, osg::Node *> visualizations;
 
   protected:
     virtual void initialize(int stage) override;

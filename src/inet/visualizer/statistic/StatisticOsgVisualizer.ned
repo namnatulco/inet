@@ -27,4 +27,5 @@ simple StatisticOsgVisualizer extends StatisticVisualizerBase like IStatisticVis
 {
     parameters:
         @class(StatisticOsgVisualizer);
+        string networkNodeVisualizerModule = default("visualizer.osgVisualizer.networkNodeVisualizer");
 }

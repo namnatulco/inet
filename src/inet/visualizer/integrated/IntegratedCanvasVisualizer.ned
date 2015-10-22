@@ -26,6 +26,7 @@ import inet.visualizer.contract.INetworkLayerVisualizer;
 import inet.visualizer.contract.INetworkNodeVisualizer;
 import inet.visualizer.contract.IPhysicalEnvironmentVisualizer;
 import inet.visualizer.contract.ISceneVisualizer;
+import inet.visualizer.contract.IStatisticVisualizer;
 import inet.visualizer.contract.ITracingObstacleLossVisualizer;
 
 //
@@ -43,6 +44,7 @@ module IntegratedCanvasVisualizer like IIntegratedVisualizer
         string obsacleLossVisualizerType = default("TracingObstacleLossCanvasVisualizer");
         string linkLayerVisualizerType = default("LinkLayerCanvasVisualizer");
         string networkLayerVisualizerType = default("NetworkLayerCanvasVisualizer");
+        string statisticVisualizerType = default("StatisticCanvasVisualizer");
     submodules:
         sceneVisualizer: <sceneVisualizerType> like ISceneVisualizer if sceneVisualizerType != "" {
             parameters:
@@ -75,5 +77,9 @@ module IntegratedCanvasVisualizer like IIntegratedVisualizer
         networkLayerVisualizer: <networkLayerVisualizerType> like INetworkLayerVisualizer if networkLayerVisualizerType != "" {
             parameters:
                 @display("p=150,750");
+        }
+        statisticVisualizer: <statisticVisualizerType> like IStatisticVisualizer if statisticVisualizerType != "" {
+            parameters:
+                @display("p=150,850");
         }
 }

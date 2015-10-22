@@ -18,6 +18,7 @@
 #ifndef __INET_STATISTICVISUALIZERBASE_H
 #define __INET_STATISTICVISUALIZERBASE_H
 
+#include "inet/common/PatternMatcher.h"
 #include "inet/visualizer/base/VisualizerBase.h"
 
 namespace inet {
@@ -30,6 +31,7 @@ class INET_API StatisticVisualizerBase : public VisualizerBase, public cListener
     /** @name Parameters */
     //@{
     cModule *statisticSubscriptionModule = nullptr;
+    PatternMatcher statisticNameMatcher;
     //@}
 
   protected:

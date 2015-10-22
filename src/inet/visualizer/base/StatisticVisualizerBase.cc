@@ -27,7 +27,10 @@ void StatisticVisualizerBase::initialize(int stage)
     VisualizerBase::initialize(stage);
     if (!hasGUI()) return;
     if (stage == INITSTAGE_LOCAL) {
+        const char *statisticNameFilter = par("statisticNameFilter");
+        statisticNameMatcher.setPattern(statisticNameFilter, false, true, true);
         statisticSubscriptionModule = *par("statisticSubscriptionModule").stringValue() == '\0' ? getSystemModule() : getModuleFromPar<cModule>(par("statisticSubscriptionModule"), this);
+        statisticSubscriptionModule->subscribe(registerSignal(statisticNameFilter), this);
     }
 }
 

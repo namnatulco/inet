@@ -26,6 +26,7 @@ import inet.visualizer.contract.INetworkLayerVisualizer;
 import inet.visualizer.contract.INetworkNodeVisualizer;
 import inet.visualizer.contract.IPhysicalEnvironmentVisualizer;
 import inet.visualizer.contract.ISceneVisualizer;
+import inet.visualizer.contract.IStatisticVisualizer;
 import inet.visualizer.contract.ITracingObstacleLossVisualizer;
 
 //
@@ -43,6 +44,7 @@ module IntegratedOsgVisualizer like IIntegratedVisualizer
         string obsacleLossVisualizerType = default("TracingObstacleLossOsgVisualizer");
         string linkLayerVisualizerType = default("LinkLayerOsgVisualizer");
         string networkLayerVisualizerType = default("NetworkLayerOsgVisualizer");
+        string statisticVisualizerType = default("StatisticOsgVisualizer");
     submodules:
         sceneVisualizer: <sceneVisualizerType> like ISceneVisualizer if sceneVisualizerType != "" {
             parameters:
@@ -75,5 +77,9 @@ module IntegratedOsgVisualizer like IIntegratedVisualizer
         networkLayerVisualizer: <networkLayerVisualizerType> like INetworkLayerVisualizer if networkLayerVisualizerType != "" {
             parameters:
                 @display("p=150,750");
+        }
+        statisticVisualizer: <statisticVisualizerType> like IStatisticVisualizer if statisticVisualizerType != "" {
+            parameters:
+                @display("p=150,850");
         }
 }
