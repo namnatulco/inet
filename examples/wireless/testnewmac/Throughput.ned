@@ -21,7 +21,7 @@ package inet.examples.wireless.testnewmac;
 import inet.applications.ethernet.EtherAppCli;
 import inet.common.queue.Sink;
 import inet.linklayer.ieee80211.Ieee80211Nic;
-import inet.mobility.single.CircleMobility;
+import inet.mobility.contract.IMobility;
 import inet.mobility.static.StationaryMobility;
 import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 
@@ -31,6 +31,7 @@ module ThroughputClient
     parameters:
         @display("i=device/wifilaptop");
         @networkNode();
+        string mobilityType;
         *.interfaceTableModule = "";
     gates:
         input radioIn @directIn;
@@ -47,7 +48,7 @@ module ThroughputClient
                 mgmtType = "Ieee80211MgmtAdhoc";
                 macType = "Ieee80211CompatibleNewMac";
         }
-        mobility: CircleMobility {
+        mobility: <mobilityType> like IMobility {
             parameters:
                 @display("p=50,141");
         }
@@ -61,6 +62,7 @@ module ThroughputServer
     parameters:
         @display("i=device/wifilaptop");
         @networkNode();
+        string mobilityType;
         *.interfaceTableModule = "";
     gates:
         input radioIn @directIn;
@@ -75,7 +77,7 @@ module ThroughputServer
                 @display("p=120,158;q=queue");
                 mgmtType = "Ieee80211MgmtAdhoc";
         }
-        mobility: StationaryMobility {
+        mobility: <mobilityType> like IMobility {
             parameters:
                 @display("p=50,141");
         }
@@ -88,7 +90,7 @@ network Throughput
 {
     parameters:
         int numCli;
-        @display("b=297,203");
+        @display("b=297,203;bgb=420,420");
     submodules:
         cliHost[numCli]: ThroughputClient {
             parameters:
