@@ -23,6 +23,9 @@
 #include "IFragmentation.h"
 
 namespace inet {
+
+class PacketSlice;
+
 namespace ieee80211 {
 
 class INET_API FragmentationNotSupported : public IFragmenter, public cObject
@@ -63,6 +66,40 @@ class INET_API BasicReassembly : public IReassembly, public cObject
         FragmentsMap fragmentsMap;
     public:
         virtual ~BasicReassembly();
+        virtual Ieee80211DataOrMgmtFrame *addFragment(Ieee80211DataOrMgmtFrame *frame) override;
+        virtual void purge(const MACAddress& address, int tid, int startSeqNumber, int endSeqNumber) override;
+};
+
+//---
+
+class INET_API PacketSliceFragmentation : public IFragmenter, public cObject
+{
+    public:
+        virtual std::vector<Ieee80211DataOrMgmtFrame*> fragment(Ieee80211DataOrMgmtFrame *frame, int fragmentationThreshold);
+};
+
+
+//TODO: can only assemble ordered fragments
+class INET_API PacketSliceReassembly : public IReassembly, public cObject
+{
+    protected:
+        struct Key {
+            MACAddress macAddress;
+            uint8_t tid;
+            uint16_t seqNum;
+            bool operator == (const Key& o) const { return macAddress == o.macAddress && tid == o.tid && seqNum == o.seqNum; }
+            bool operator < (const Key& o) const { return macAddress < o.macAddress || (macAddress == o.macAddress && (tid < o.tid || (tid == o.tid && seqNum < o.seqNum))); }
+        };
+        struct Value {
+            std::map<int,PacketSlice*> slices;
+            uint16_t receivedFragments = 0; // each bit corresponds to a fragment number
+            uint16_t allFragments = 0; // bits for all fragments set to one (0..numFragments-1); 0 means unfilled
+            short int numFragments = 0; // number of all fragments or zero if currently unknown
+            ~Value();
+        };
+        typedef std::map<Key,Value> FragmentsMap;
+        FragmentsMap fragmentsMap;
+    public:
         virtual Ieee80211DataOrMgmtFrame *addFragment(Ieee80211DataOrMgmtFrame *frame) override;
         virtual void purge(const MACAddress& address, int tid, int startSeqNumber, int endSeqNumber) override;
 };
