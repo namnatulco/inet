@@ -91,6 +91,20 @@ class INET_API MessageSourceAddrFilter : public cObjectResultFilter
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object) override;
 };
 
+/**
+ * Filter that expects a cPacket and outputs the throughput as double.
+ */
+class INET_API ThroughputFilter : public cObjectResultFilter
+{
+  protected:
+    simtime_t lastStart = 0;
+    double bytes = 0;
+    double throughput = 0;
+
+  public:
+    virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object) override;
+};
+
 } // namespace filters
 
 } // namespace utils

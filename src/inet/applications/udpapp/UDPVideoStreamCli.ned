@@ -42,9 +42,10 @@ simple UDPVideoStreamCli like IUDPApp
         int serverPort;  // server port
         double startTime @unit(s) = default(1s);
         @display("i=block/app");
-        @signal[rcvdPk](type=cPacket);
-        @statistic[rcvdPk](title="packets received"; source=rcvdPk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-        @statistic[endToEndDelay](title="end-to-end delay"; source="messageAge(rcvdPk)"; unit=s; record=histogram,vector; interpolationmode=none);
+        @signal[xxxrcvdPk](type=cPacket);
+//        @statistic[xxxrcvdPk](title="packets received"; source=xxxrcvdPk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @statistic[throughput](title="throughput"; source="throughput(xxxrcvdPk)"; record=last);
+//        @statistic[endToEndDelay](title="end-to-end delay"; source="messageAge(xxxrcvdPk)"; unit=s; record=histogram,vector; interpolationmode=none);
     gates:
         input udpIn @labels(UDPControlInfo/up);
         output udpOut @labels(UDPControlInfo/down);

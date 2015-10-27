@@ -32,10 +32,38 @@ class INET_API StatisticOsgVisualizer : public StatisticVisualizerBase
 {
 #ifdef WITH_OSG
   protected:
-    std::map<std::pair<int, int>, osg::Node *> visualizations;
+    class INET_API LastValueRecorder : public cNumericResultRecorder
+    {
+      protected:
+        double lastValue = NaN;
+
+      protected:
+        virtual void collect(simtime_t_cref t, double value) override { lastValue = value; }
+
+      public:
+        double getLastValue() const { return lastValue; }
+    };
+
+    class CacheEntry {
+      public:
+        LastValueRecorder *recorder = nullptr;
+        osg::Node *visualization = nullptr;
+
+      public:
+        CacheEntry() { }
+        CacheEntry(LastValueRecorder *recorder, osg::Node *visualization) : recorder(recorder), visualization(visualization) { }
+    };
+
+    typedef std::pair<int, int> CacheKey;
+
+  protected:
+    std::map<CacheKey, CacheEntry> cacheEntries;
 
   protected:
     virtual void initialize(int stage) override;
+
+    virtual cResultFilter *findResultFilter(cComponent *source, simsignal_t signal);
+    virtual cResultFilter *findResultFilter(cResultFilter *parentResultFilter, cResultListener *resultListener);
 
   public:
     virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object) override;

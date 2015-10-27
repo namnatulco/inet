@@ -36,6 +36,14 @@ class INET_API StatisticVisualizerBase : public VisualizerBase, public cListener
 
   protected:
     virtual void initialize(int stage) override;
+
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, bool b) override { }
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, long l) override { }
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, unsigned long l) override { }
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, double d) override { }
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, const SimTime& t) override { }
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, const char *s) override { }
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj) override { }
 };
 
 } // namespace visualizer

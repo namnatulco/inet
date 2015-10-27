@@ -98,6 +98,22 @@ void MessageSourceAddrFilter::receiveSignal(cResultFilter *prev, simtime_t_cref 
     }
 }
 
+Register_ResultFilter("throughput", ThroughputFilter);
+
+void ThroughputFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object)
+{
+    if (auto packet = dynamic_cast<cPacket *>(object)) {
+        const simtime_t now = simTime();
+        if (now - lastStart >= 0.1) {
+            throughput = bytes / (now - lastStart).dbl();
+            lastStart = now;
+            bytes = 0;
+            fire(this, now, throughput);
+        }
+        bytes += packet->getBitLength();
+    }
+}
+
 } // namespace filters
 
 } // namespace utils

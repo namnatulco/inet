@@ -34,42 +34,76 @@ void StatisticOsgVisualizer::initialize(int stage)
     if (!hasGUI()) return;
 }
 
+cResultFilter *StatisticOsgVisualizer::findResultFilter(cComponent *source, simsignal_t signal)
+{
+    auto listeners = source->getLocalSignalListeners(signal);
+    for (auto listener : listeners) {
+        if (auto resultListener = dynamic_cast<cResultListener *>(listener)) {
+            auto foundResultFilter = findResultFilter(nullptr, resultListener);
+            if (foundResultFilter != nullptr)
+                return foundResultFilter;
+        }
+    }
+    return nullptr;
+}
+
+cResultFilter *StatisticOsgVisualizer::findResultFilter(cResultFilter *parentResultFilter, cResultListener *resultListener)
+{
+    if (dynamic_cast<cResultRecorder *>(resultListener))
+        return parentResultFilter;
+    else if (auto resultFilter = dynamic_cast<cResultFilter *>(resultListener)) {
+        auto delegates = resultFilter->getDelegates();
+        for (auto delegate : delegates) {
+            auto foundResultFilter = findResultFilter(resultFilter, delegate);
+            if (foundResultFilter != nullptr)
+                return foundResultFilter;
+        }
+    }
+    return nullptr;
+}
+
 void StatisticOsgVisualizer::receiveSignal(cComponent *source, simsignal_t signal, cObject *object)
 {
-    auto networkNodeVisualizer = getModuleFromPar<NetworkNodeOsgVisualizer>(par("networkNodeVisualizerModule"), this);
-    auto networkNode = getContainingNode(check_and_cast<cModule *>(source));
-    auto visualization = networkNodeVisualizer->getNeworkNodeVisualization(networkNode);
-    auto annotation = visualization->getAnnotationPart();
-    auto packet = check_and_cast<cPacket *>(object);
-    auto key = std::pair<int, int>(source->getId(), signal);
-    auto it = visualizations.find(key);
-    if (it == visualizations.end()) {
-        auto label = new osgText::Text();
-        label->setCharacterSize(18);
-        label->setBoundingBoxColor(osg::Vec4(1.0, 1.0, 1.0, 0.5));
-        label->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
-        label->setAlignment(osgText::Text::CENTER_BOTTOM);
-        label->setText(packet->getName());
-        label->setDrawMode(osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::TEXT);
-        label->setPosition(osg::Vec3(0.0, 0.0, 2));
-        auto geode = new osg::Geode();
-        geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
-        geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
-        geode->addDrawable(label);
-        auto autoTransform = new osg::AutoTransform();
-        autoTransform->setPivotPoint(osg::Vec3d(0.0, 0.0, 0.0));
-        autoTransform->setAutoScaleToScreen(true);
-        autoTransform->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_SCREEN);
-        autoTransform->setPosition(osg::Vec3d(0.0, 0.0, 10));
-        autoTransform->addChild(geode);
-        annotation->addChild(autoTransform);
-        visualizations[key] = autoTransform;
-    }
-    else {
-        auto autoTransform = check_and_cast<osg::AutoTransform *>(it->second);
-        auto geode = check_and_cast<osg::Geode *>(autoTransform->getChild(0));
-        auto label = check_and_cast<osgText::Text *>(geode->getDrawable(0));
-        label->setText(packet->getName());
+    auto resultFilter = findResultFilter(source, signal);
+    if (resultFilter != nullptr) {
+        auto networkNodeVisualizer = getModuleFromPar<NetworkNodeOsgVisualizer>(par("networkNodeVisualizerModule"), this);
+        auto networkNode = getContainingNode(check_and_cast<cModule *>(source));
+        auto visualization = networkNodeVisualizer->getNeworkNodeVisualization(networkNode);
+        auto annotation = visualization->getAnnotationPart();
+        auto cacheKey = CacheKey(source->getId(), signal);
+        auto it = cacheEntries.find(cacheKey);
+        if (it == cacheEntries.end()) {
+            auto label = new osgText::Text();
+            label->setCharacterSize(18);
+            label->setBoundingBoxColor(osg::Vec4(1.0, 1.0, 1.0, 0.5));
+            label->setColor(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+            label->setAlignment(osgText::Text::CENTER_BOTTOM);
+            label->setText("");
+            label->setDrawMode(osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::TEXT);
+            label->setPosition(osg::Vec3(0.0, 0.0, 2));
+            auto geode = new osg::Geode();
+            geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+            geode->getOrCreateStateSet()->setAttributeAndModes(new osg::Program(), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+            geode->addDrawable(label);
+            auto autoTransform = new osg::AutoTransform();
+            autoTransform->setPivotPoint(osg::Vec3d(0.0, 0.0, 0.0));
+            autoTransform->setAutoScaleToScreen(true);
+            autoTransform->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_SCREEN);
+            autoTransform->setPosition(osg::Vec3d(0.0, 0.0, 10));
+            autoTransform->addChild(geode);
+            annotation->addChild(autoTransform);
+            auto resultRecorder = new LastValueRecorder();
+            resultFilter->addDelegate(resultRecorder);
+            cacheEntries[cacheKey] = CacheEntry(resultRecorder, autoTransform);
+        }
+        else {
+            auto autoTransform = check_and_cast<osg::AutoTransform *>(it->second.visualization);
+            auto geode = check_and_cast<osg::Geode *>(autoTransform->getChild(0));
+            auto label = check_and_cast<osgText::Text *>(geode->getDrawable(0));
+            char temp[128];
+            sprintf(temp, "%.2g Mbps", it->second.recorder->getLastValue() / 1E+6);
+            label->setText(temp);
+        }
     }
 }
 
