@@ -45,6 +45,11 @@ void BasicRateSelection::initialize()
     dataFrameMode = (dataBitrate == -1) ? modeSet->getFastestMode() : modeSet->getMode(bps(dataBitrate));
 
     slowestMandatoryMode = modeSet->getSlowestMandatoryMode();
+
+    WATCH(controlFrameMode);
+    WATCH(dataFrameMode);
+    WATCH(multicastFrameMode);
+    WATCH(slowestMandatoryMode);
 }
 
 void BasicRateSelection::setRateControl(IRateControl *rateControl)

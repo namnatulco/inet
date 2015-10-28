@@ -173,7 +173,7 @@ std::ostream& Ieee80211OFDMMode::printToStream(std::ostream& stream, int level) 
         stream << ", preambleMode = " << printObjectToString(preambleMode, level - 1)
                << ", signalMode = " << printObjectToString(signalMode, level - 1);
     if (level >= PRINT_LEVEL_DETAIL)
-        stream << ", dataMode = " << printObjectToString(dataMode, level - 1);
+        stream << ", dataMode = " << printObjectToString(dataMode, level);
     return stream;
 }
 
