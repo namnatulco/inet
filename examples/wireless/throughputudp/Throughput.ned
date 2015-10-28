@@ -31,11 +31,11 @@ network Throughput
         @display("b=297,203");
     submodules:
         configurator: IPv4NetworkConfigurator {
-            @display("p=61,164");
+            @display("p=5,5");
         }
         ap: AccessPoint {
             parameters:
-                @display("p=200,200;r=,,#707070");
+                @display("p=20,15;r=,,#707070");
         }
         srvHost: WirelessHost {
             parameters:
@@ -47,7 +47,7 @@ network Throughput
         }
         radioMedium: Ieee80211ScalarRadioMedium {
             parameters:
-                @display("p=61,46");
+                @display("p=15,5");
         }
 }
 
