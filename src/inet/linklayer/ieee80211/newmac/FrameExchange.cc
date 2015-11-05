@@ -360,6 +360,17 @@ void StepBasedFrameExchange::cleanupAndReportResult()
     // success/failure callback might has probably deleted the frame exchange object!
 }
 
+void StepBasedFrameExchange::startContentionIfNeeded(int retryCount)
+{
+    if (!contention[defaultTxIndex]->isOwning())
+        startContention(retryCount);
+    else
+    {
+        setOperation(START_CONTENTION);
+        proceed();
+    }
+}
+
 void StepBasedFrameExchange::startContention(int retryCount)
 {
     startContention(retryCount, defaultTxIndex, defaultAccessCategory);
@@ -467,4 +478,3 @@ void StepBasedFrameExchange::cleanup()
 
 } // namespace ieee80211
 } // namespace inet
-

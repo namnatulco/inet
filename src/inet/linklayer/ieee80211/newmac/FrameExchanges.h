@@ -101,6 +101,8 @@ class INET_API SendMulticastDataFrameExchange : public FrameExchange
         int retryCount = 0;
     protected:
         virtual void startContention();
+        virtual void startContentionIfNeeded();
+
     public:
         SendMulticastDataFrameExchange(FrameExchangeContext *context, IFinishedCallback *callback, Ieee80211DataOrMgmtFrame *dataFrame, int txIndex, AccessCategory accessCategory);
         ~SendMulticastDataFrameExchange();
