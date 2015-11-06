@@ -281,8 +281,12 @@ void BasicContention::computeRemainingBackoffSlots()
 {
     simtime_t remainingTime = scheduledTransmissionTime - simTime();
     int remainingSlots = (int)ceil(remainingTime / slotTime);  //TODO this is not accurate
-    if (remainingSlots < backoffSlots) // don't count IFS
+    if (remainingSlots < backoffSlots) { // don't count IFS
+        ASSERT(remainingSlots >= 0);
+        EV_DEBUG << "old backoff[" << getIndex() << "] period is " << backoffSlots * slotTime << ", remainingTime " << remainingTime << endl;
         backoffSlots = remainingSlots;
+        EV_DEBUG << "backoff[" << getIndex() << "] period decreased to " << backoffSlots * slotTime << endl;
+    }
 }
 
 void BasicContention::reportChannelAccessGranted()
