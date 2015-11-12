@@ -77,8 +77,6 @@ class INET_API BasicContention : public cSimpleModule, public IContention, prote
         virtual void cancelTransmissionRequest();
         virtual void switchToEifs();
         virtual void computeRemainingBackoffSlots();
-        virtual void reportChannelAccessGranted();
-        virtual void reportInternalCollision();
         virtual void updateDisplayString();
         const char *getEventName(EventType event);
 
@@ -88,11 +86,13 @@ class INET_API BasicContention : public cSimpleModule, public IContention, prote
 
         //TODO also add a switchToReception() method? because switching takes time, so we dont automatically switch to tx after completing a transmission! (as we may want to transmit immediate frames afterwards)
         virtual void startContention(simtime_t ifs, simtime_t eifs, int cwMin, int cwMax, simtime_t slotTime, int retryCount, IContentionCallback *callback) override;
+        virtual void setContentionCallback(IContentionCallback *callback) override { this->callback = callback; }
         virtual void channelReleased() override;
 
         virtual void mediumStateChanged(bool mediumFree) override;
         virtual void corruptedFrameReceived() override;
         virtual bool isOwning() override;
+        virtual bool isContentionInProgress() override;
 };
 
 } // namespace ieee80211

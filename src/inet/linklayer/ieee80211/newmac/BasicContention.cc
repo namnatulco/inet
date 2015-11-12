@@ -18,6 +18,7 @@
 //
 
 #include "BasicContention.h"
+#include "ITxCallback.h"
 #include "IUpperMac.h"
 #include "IMacRadioInterface.h"
 #include "IStatistics.h"
@@ -188,9 +189,9 @@ void BasicContention::handleWithFSM(EventType event, cMessage *msg)
     }
     // emit(stateSignal, fsm.getState()); TODO
     if (finallyReportChannelAccessGranted)
-        reportChannelAccessGranted();
+        callback->channelAccessGranted(txIndex);
     if (finallyReportInternalCollision)
-        reportInternalCollision();
+        callback->internalCollision(txIndex);
     if (hasGUI())
         updateDisplayString();
 }
@@ -284,16 +285,6 @@ void BasicContention::computeRemainingBackoffSlots()
         backoffSlots = remainingSlots;
 }
 
-void BasicContention::reportChannelAccessGranted()
-{
-    upperMac->channelAccessGranted(callback, txIndex);
-}
-
-void BasicContention::reportInternalCollision()
-{
-    upperMac->internalCollision(callback, txIndex);
-}
-
 const char *BasicContention::getEventName(EventType event)
 {
 #define CASE(x)   case x: return #x;
@@ -320,6 +311,11 @@ void BasicContention::updateDisplayString()
 bool BasicContention::isOwning()
 {
     return fsm.getState() == OWNING;
+}
+
+bool BasicContention::isContentionInProgress()
+{
+    return fsm.getState() != IDLE;
 }
 
 } // namespace ieee80211
