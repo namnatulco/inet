@@ -27,6 +27,7 @@ const unsigned int LENGTH_RTS = 160;    //bits
 const unsigned int LENGTH_CTS = 112;    //bits
 const unsigned int LENGTH_ACK = 112;    //bits
 const unsigned int LENGTH_MGMT = 28 * 8;    //bits
+const unsigned int LENGTH_A_MSDU_SUBFRAME_HEADER = 14 * 8; //48 + 48 + 16 bits
 const unsigned int DATAFRAME_HEADER_MINLENGTH = 28 * 8;    //bits without QoS, without Address4, without SNAP: 2 + 2 + 3*6(addresses) + 2 + 4(crc)
 const unsigned int QOSCONTROL_BITS = 2 * 8;    // QoS Control field
 
