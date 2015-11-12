@@ -91,7 +91,6 @@ class INET_API Ieee80211NewMac : public MACProtocolBase, public IMacRadioInterfa
     void configureRadioMode(IRadio::RadioMode radioMode);
     virtual InterfaceEntry *createInterfaceEntry() override;
     virtual const MACAddress& isInterfaceRegistered();
-    void transmissionStateChanged(IRadio::TransmissionState transmissionState);
 
     /** @brief Handle commands (msg kind+control info) coming from upper layers */
     virtual void handleUpperCommand(cMessage *msg) override;
