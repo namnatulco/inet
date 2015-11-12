@@ -82,6 +82,7 @@ void BasicRx::lowerFrameReceived(Ieee80211Frame *frame)
 
 void BasicRx::frameTransmitted(simtime_t durationField)
 {
+    Enter_Method_Silent();
     // the txIndex that transmitted the frame should already own the TXOP, so
     // it has no need to (and should not) check the NAV.
     setOrExtendNav(durationField);
