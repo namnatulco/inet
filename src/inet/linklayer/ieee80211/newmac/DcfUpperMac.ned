@@ -32,6 +32,7 @@ simple DcfUpperMac like IUpperMac
         string rateSelectionModule;
         string rateControlModule;
         string statisticsModule;
+        string msduAggregatorModule;
 
         int rtsThreshold @unit("B") = default(2346B); // longer frames will be sent using RTS/CTS
         int shortRetryLimit = default(-1); // maximum number of retries per frame, -1 means default
@@ -46,5 +47,10 @@ simple DcfUpperMac like IUpperMac
         int cwMulticast = default(-1); // contention window for multicast frames, -1 means default
         string fragmenterClass = default("BasicFragmentation");
         string reassemblyClass = default("BasicReassembly");
+        string aggregatorClass = default("BasicMsduAggregation");
         @display("i=block/layer");
+
+//    submodules:
+
+
 }
