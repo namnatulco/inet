@@ -21,7 +21,7 @@ package inet.examples.wireless.throughputudp;
 import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
 import inet.node.inet.WirelessHost;
 import inet.node.wireless.AccessPoint;
-import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
+import inet.physicallayer.idealradio.IdealRadioMedium;
 
 
 network Throughput
@@ -45,7 +45,7 @@ network Throughput
             parameters:
                 @display("r=,,#707070");
         }
-        radioMedium: Ieee80211ScalarRadioMedium {
+        radioMedium: IdealRadioMedium {
             parameters:
                 @display("p=15,5");
         }
