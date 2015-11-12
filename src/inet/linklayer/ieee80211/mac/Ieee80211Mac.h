@@ -36,6 +36,7 @@
 #include "inet/linklayer/ieee80211/mac/Ieee80211Frame_m.h"
 #include "inet/linklayer/ieee80211/mac/Ieee80211Consts.h"
 #include "inet/linklayer/ieee80211/mac/IQoSClassifier.h"
+#include "inet/linklayer/ieee80211/newmac/AccessCategory.h"
 
 namespace inet {
 
