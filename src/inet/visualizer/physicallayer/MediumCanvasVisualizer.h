@@ -95,12 +95,12 @@ class INET_API MediumCanvasVisualizer : public MediumVisualizerBase
   protected:
     virtual void initialize(int stage) override;
     virtual void handleMessage(cMessage *message) override;
+    virtual void refreshDisplay() override;
 
     virtual cFigure *getCachedFigure(const ITransmission *transmission) const;
     virtual void setCachedFigure(const ITransmission *transmission, cFigure *figure);
     virtual void removeCachedFigure(const ITransmission *transmission);
 
-    virtual void updateCanvas() const;
     virtual void scheduleUpdateCanvasTimer();
 
   public:

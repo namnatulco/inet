@@ -89,10 +89,8 @@ void MediumOsgVisualizer::initialize(int stage)
 
 void MediumOsgVisualizer::handleMessage(cMessage *message)
 {
-    if (message == updateSceneTimer) {
-        updateScene();
+    if (message == updateSceneTimer)
         scheduleUpdateSceneTimer();
-    }
     else
         throw cRuntimeError("Unknown message");
 }
@@ -228,8 +226,6 @@ osg::Node *MediumOsgVisualizer::createTransmissionNode(const ITransmission *tran
 void MediumOsgVisualizer::mediumChanged()
 {
     Enter_Method_Silent();
-    if (displaySignals)
-        updateScene();
 }
 
 void MediumOsgVisualizer::radioAdded(const IRadio *radio)
@@ -324,7 +320,6 @@ void MediumOsgVisualizer::transmissionAdded(const ITransmission *transmission)
         auto scene = inet::osg::getScene(visualizerTargetModule);
         scene->addChild(node);
         setCachedOsgNode(transmission, node);
-        updateScene();
         if (updateInterval > 0)
             scheduleUpdateSceneTimer();
     }
@@ -406,43 +401,43 @@ void MediumOsgVisualizer::packetReceived(const IReceptionDecision *decision)
             scene->addChild(geode);
         }
     }
-    if (displaySignals)
-        updateScene();
 }
 
-void MediumOsgVisualizer::updateScene() const
+void MediumOsgVisualizer::refreshDisplay()
 {
-    const IPropagation *propagation = radioMedium->getPropagation();
-    for (auto transmission : transmissions) {
-        auto transmissionStart = transmission->getStartPosition();
-        double startRadius = propagation->getPropagationSpeed().get() * (simTime() - transmission->getStartTime()).dbl();
-        double endRadius = std::max(0.0, propagation->getPropagationSpeed().get() * (simTime() - transmission->getEndTime()).dbl());
-        auto node = getCachedOsgNode(transmission);
-        if (node != nullptr) {
-            osg::Drawable *drawable;
-            switch (signalShape) {
-                case SIGNAL_SHAPE_RING: {
-                    auto autoTransform = static_cast<osg::PositionAttitudeTransform *>(node)->getChild(0);
-                    auto geode = static_cast<osg::AutoTransform *>(autoTransform)->getChild(0);
-                    drawable = static_cast<osg::Geode *>(geode)->getDrawable(0);
-                    auto vertices = inet::osg::createAnnulusVertices(Coord::ZERO, startRadius, endRadius, 100);
-                    static_cast<osg::Geometry *>(drawable)->setVertexArray(vertices);
-                    autoTransform->setNodeMask(startRadius > 0 ? -1 : 0);
-                    break;
+    if (displaySignals) {
+        const IPropagation *propagation = radioMedium->getPropagation();
+        for (auto transmission : transmissions) {
+            auto transmissionStart = transmission->getStartPosition();
+            double startRadius = propagation->getPropagationSpeed().get() * (simTime() - transmission->getStartTime()).dbl();
+            double endRadius = std::max(0.0, propagation->getPropagationSpeed().get() * (simTime() - transmission->getEndTime()).dbl());
+            auto node = getCachedOsgNode(transmission);
+            if (node != nullptr) {
+                osg::Drawable *drawable;
+                switch (signalShape) {
+                    case SIGNAL_SHAPE_RING: {
+                        auto autoTransform = static_cast<osg::PositionAttitudeTransform *>(node)->getChild(0);
+                        auto geode = static_cast<osg::AutoTransform *>(autoTransform)->getChild(0);
+                        drawable = static_cast<osg::Geode *>(geode)->getDrawable(0);
+                        auto vertices = inet::osg::createAnnulusVertices(Coord::ZERO, startRadius, endRadius, 100);
+                        static_cast<osg::Geometry *>(drawable)->setVertexArray(vertices);
+                        autoTransform->setNodeMask(startRadius > 0 ? -1 : 0);
+                        break;
+                    }
+                    case SIGNAL_SHAPE_SPHERE: {
+                        drawable = static_cast<osg::Geode *>(node)->getDrawable(0);
+                        auto shape = static_cast<osg::Sphere *>(drawable->getShape());
+                        shape->setRadius(startRadius);
+                        drawable->dirtyDisplayList();
+                        drawable->dirtyBound();
+                        double alpha = 1.0 / pow(startRadius, signalOpacityExponent);
+                        auto material = static_cast<osg::Material *>(drawable->getOrCreateStateSet()->getAttribute(osg::StateAttribute::MATERIAL));
+                        material->setAlpha(osg::Material::FRONT_AND_BACK, std::max(0.1, alpha));
+                        break;
+                    }
+                    default:
+                        throw cRuntimeError("Unimplemented signal shape");
                 }
-                case SIGNAL_SHAPE_SPHERE: {
-                    drawable = static_cast<osg::Geode *>(node)->getDrawable(0);
-                    auto shape = static_cast<osg::Sphere *>(drawable->getShape());
-                    shape->setRadius(startRadius);
-                    drawable->dirtyDisplayList();
-                    drawable->dirtyBound();
-                    double alpha = 1.0 / pow(startRadius, signalOpacityExponent);
-                    auto material = static_cast<osg::Material *>(drawable->getOrCreateStateSet()->getAttribute(osg::StateAttribute::MATERIAL));
-                    material->setAlpha(osg::Material::FRONT_AND_BACK, std::max(0.1, alpha));
-                    break;
-                }
-                default:
-                    throw cRuntimeError("Unimplemented signal shape");
             }
         }
     }

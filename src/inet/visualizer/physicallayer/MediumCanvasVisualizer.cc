@@ -93,10 +93,8 @@ void MediumCanvasVisualizer::initialize(int stage)
 
 void MediumCanvasVisualizer::handleMessage(cMessage *message)
 {
-    if (message == updateCanvasTimer) {
-        updateCanvas();
+    if (message == updateCanvasTimer)
         scheduleUpdateCanvasTimer();
-    }
     else
         throw cRuntimeError("Unknown message");
 }
@@ -123,8 +121,6 @@ void MediumCanvasVisualizer::removeCachedFigure(const ITransmission *transmissio
 void MediumCanvasVisualizer::mediumChanged()
 {
     Enter_Method_Silent();
-    if (displaySignals)
-        updateCanvas();
 }
 
 void MediumCanvasVisualizer::radioAdded(const IRadio *radio)
@@ -179,7 +175,6 @@ void MediumCanvasVisualizer::transmissionAdded(const ITransmission *transmission
         groupFigure->addFigure(nameFigure);
         communicationLayer->addFigure(groupFigure);
         setCachedFigure(transmission, groupFigure);
-        updateCanvas();
         if (updateInterval > 0)
             scheduleUpdateCanvasTimer();
     }
@@ -252,65 +247,65 @@ void MediumCanvasVisualizer::packetReceived(const IReceptionDecision *decision)
         }
 #endif
     }
-    if (displaySignals)
-        updateCanvas();
 }
 
-void MediumCanvasVisualizer::updateCanvas() const
+void MediumCanvasVisualizer::refreshDisplay()
 {
-    const IPropagation *propagation = radioMedium->getPropagation();
+    if (displaySignals) {
+        const IPropagation *propagation = radioMedium->getPropagation();
 #if OMNETPP_CANVAS_VERSION >= 0x20140908
-    if (communicationHeat != nullptr)
-        communicationHeat->coolDown();
+        if (communicationHeat != nullptr)
+            communicationHeat->coolDown();
 #endif
-    for (const auto transmission : transmissions) {
-        cFigure *groupFigure = getCachedFigure(transmission);
-        double startRadius = propagation->getPropagationSpeed().get() * (simTime() - transmission->getStartTime()).dbl();
-        double endRadius = std::max(0.0, propagation->getPropagationSpeed().get() * (simTime() - transmission->getEndTime()).dbl());
-        if (groupFigure) {
+        for (const auto transmission : transmissions) {
+            cFigure *groupFigure = getCachedFigure(transmission);
+            double startRadius = propagation->getPropagationSpeed().get() * (simTime() - transmission->getStartTime()).dbl();
+            double endRadius = std::max(0.0, propagation->getPropagationSpeed().get() * (simTime() - transmission->getEndTime()).dbl());
+            if (groupFigure) {
 #if OMNETPP_CANVAS_VERSION >= 0x20140908
-            cRingFigure *communicationFigure = (cRingFigure *)groupFigure->getFigure(0);
+                cRingFigure *communicationFigure = (cRingFigure *)groupFigure->getFigure(0);
 #else
-            cOvalFigure *communicationFigure = (cOvalFigure *)groupFigure->getFigure(0);
+                cOvalFigure *communicationFigure = (cOvalFigure *)groupFigure->getFigure(0);
 #endif
-            const Coord transmissionStart = transmission->getStartPosition();
-            // KLUDGE: to workaround overflow bugs in drawing
-            if (startRadius > 10000)
-                startRadius = 10000;
-            if (endRadius > 10000)
-                endRadius = 10000;
-            switch (signalShape) {
+                const Coord transmissionStart = transmission->getStartPosition();
+                // KLUDGE: to workaround overflow bugs in drawing
+                if (startRadius > 10000)
+                    startRadius = 10000;
+                if (endRadius > 10000)
+                    endRadius = 10000;
+                switch (signalShape) {
 #if OMNETPP_CANVAS_VERSION >= 0x20140908
-                case SIGNAL_SHAPE_RING: {
-                    // determine the rotated 2D canvas points by computing the 2D affine trasnformation from the 3D transformation of the environment
-                    cFigure::Point o = canvasProjection->computeCanvasPoint(transmissionStart);
-                    cFigure::Point x = canvasProjection->computeCanvasPoint(transmissionStart + Coord(1, 0, 0));
-                    cFigure::Point y = canvasProjection->computeCanvasPoint(transmissionStart + Coord(0, 1, 0));
-                    double t1 = o.x;
-                    double t2 = o.y;
-                    double a = x.x - t1;
-                    double b = x.y - t2;
-                    double c = y.x - t1;
-                    double d = y.y - t2;
-                    communicationFigure->setTransform(cFigure::Transform(a, b, c, d, t1, t2));
-                    communicationFigure->setBounds(cFigure::Rectangle(-startRadius, -startRadius, startRadius * 2, startRadius * 2));
-                    communicationFigure->setInnerRx(endRadius);
-                    communicationFigure->setInnerRy(endRadius);
-                    break;
-                }
+                    case SIGNAL_SHAPE_RING: {
+                        // determine the rotated 2D canvas points by computing the 2D affine trasnformation from the 3D transformation of the environment
+                        cFigure::Point o = canvasProjection->computeCanvasPoint(transmissionStart);
+                        cFigure::Point x = canvasProjection->computeCanvasPoint(transmissionStart + Coord(1, 0, 0));
+                        cFigure::Point y = canvasProjection->computeCanvasPoint(transmissionStart + Coord(0, 1, 0));
+                        double t1 = o.x;
+                        double t2 = o.y;
+                        double a = x.x - t1;
+                        double b = x.y - t2;
+                        double c = y.x - t1;
+                        double d = y.y - t2;
+                        communicationFigure->setTransform(cFigure::Transform(a, b, c, d, t1, t2));
+                        communicationFigure->setBounds(cFigure::Rectangle(-startRadius, -startRadius, startRadius * 2, startRadius * 2));
+                        communicationFigure->setInnerRx(endRadius);
+                        communicationFigure->setInnerRy(endRadius);
+                        break;
+                    }
 #endif
-                case SIGNAL_SHAPE_SPHERE: {
-                    // a sphere looks like a circle from any view angle
-                    cFigure::Point center = canvasProjection->computeCanvasPoint(transmissionStart);
-                    communicationFigure->setBounds(cFigure::Rectangle(center.x - startRadius, center.y - startRadius, 2 * startRadius, 2 * startRadius));
+                    case SIGNAL_SHAPE_SPHERE: {
+                        // a sphere looks like a circle from any view angle
+                        cFigure::Point center = canvasProjection->computeCanvasPoint(transmissionStart);
+                        communicationFigure->setBounds(cFigure::Rectangle(center.x - startRadius, center.y - startRadius, 2 * startRadius, 2 * startRadius));
 #if OMNETPP_CANVAS_VERSION >= 0x20140908
-                    communicationFigure->setInnerRx(endRadius);
-                    communicationFigure->setInnerRy(endRadius);
+                        communicationFigure->setInnerRx(endRadius);
+                        communicationFigure->setInnerRy(endRadius);
 #endif
-                    break;
+                        break;
+                    }
+                    default:
+                        throw cRuntimeError("Unimplemented signal shape");
                 }
-                default:
-                    throw cRuntimeError("Unimplemented signal shape");
             }
         }
     }
