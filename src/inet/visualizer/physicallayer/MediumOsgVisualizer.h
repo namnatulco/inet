@@ -96,8 +96,6 @@ class INET_API MediumOsgVisualizer : public MediumVisualizerBase, public cListen
   public:
     virtual ~MediumOsgVisualizer();
 
-    virtual void mediumChanged() override;
-
     virtual void radioAdded(const IRadio *radio) override;
     virtual void radioRemoved(const IRadio *radio) override;
 
@@ -112,8 +110,6 @@ class INET_API MediumOsgVisualizer : public MediumVisualizerBase, public cListen
     virtual void packetReceived(const IReceptionDecision *decision) override;
 
 #else
-
-    virtual void mediumChanged() override {}
 
     virtual void radioAdded(const IRadio *radio) override {}
     virtual void radioRemoved(const IRadio *radio) override {}

@@ -118,11 +118,6 @@ void MediumCanvasVisualizer::removeCachedFigure(const ITransmission *transmissio
     transmissionFigures.erase(transmission);
 }
 
-void MediumCanvasVisualizer::mediumChanged()
-{
-    Enter_Method_Silent();
-}
-
 void MediumCanvasVisualizer::radioAdded(const IRadio *radio)
 {
     Enter_Method_Silent();

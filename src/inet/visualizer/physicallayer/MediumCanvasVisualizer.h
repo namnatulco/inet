@@ -106,8 +106,6 @@ class INET_API MediumCanvasVisualizer : public MediumVisualizerBase
   public:
     virtual ~MediumCanvasVisualizer();
 
-    virtual void mediumChanged() override;
-
     virtual void radioAdded(const IRadio *radio) override;
     virtual void radioRemoved(const IRadio *radio) override;
 

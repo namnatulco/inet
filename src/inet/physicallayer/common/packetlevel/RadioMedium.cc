@@ -160,10 +160,8 @@ std::ostream& RadioMedium::printToStream(std::ostream &stream, int level) const
 
 void RadioMedium::handleMessage(cMessage *message)
 {
-    if (message == removeNonInterferingTransmissionsTimer) {
+    if (message == removeNonInterferingTransmissionsTimer)
         removeNonInterferingTransmissions();
-        fireMediumChanged();
-    }
     else
         throw cRuntimeError("Unknown message");
 }
@@ -582,7 +580,6 @@ bool RadioMedium::isReceptionAttempted(const IRadio *radio, const ITransmission 
     bool isReceptionAttempted = radio->getReceiver()->computeIsReceptionAttempted(listening, reception, interference);
     delete interference;
     EV_DEBUG << "Receiving " << transmission << " from medium by " << radio << " arrives as " << reception << " and results in reception is " << (isReceptionAttempted ? "attempted" : "ignored") << endl;
-    fireMediumChanged();
     return isReceptionAttempted;
 }
 
@@ -628,12 +625,6 @@ void RadioMedium::receiveSignal(cComponent *source, simsignal_t signal, long val
             }
         }
     }
-}
-
-void RadioMedium::fireMediumChanged() const
-{
-    for (auto listener : listeners)
-        listener->mediumChanged();
 }
 
 void RadioMedium::fireRadioAdded(const IRadio *radio) const

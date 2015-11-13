@@ -223,11 +223,6 @@ osg::Node *MediumOsgVisualizer::createTransmissionNode(const ITransmission *tran
     }
 }
 
-void MediumOsgVisualizer::mediumChanged()
-{
-    Enter_Method_Silent();
-}
-
 void MediumOsgVisualizer::radioAdded(const IRadio *radio)
 {
     Enter_Method_Silent();
