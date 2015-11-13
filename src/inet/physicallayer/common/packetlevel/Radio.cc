@@ -20,6 +20,10 @@
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/ModuleAccess.h"
 
+
+#include "inet/linklayer/ieee80211/mac/Ieee80211Frame_m.h"
+
+
 namespace inet {
 
 namespace physicallayer {
@@ -293,6 +297,19 @@ void Radio::startTransmission(cPacket *macFrame)
     EV_INFO << "Transmission of " << (IRadioFrame *)radioFrame << " as " << radioFrame->getTransmission() << " is started.\n";
     ASSERT(radioFrame->getDuration() != 0);
     endTransmissionTimer->setControlInfo(const_cast<RadioFrame *>(radioFrame));
+
+    auto *df = dynamic_cast<inet::ieee80211::Ieee80211DataFrame *>(macFrame);
+    int tid = df ? df->getTid() : -1;
+    const char *ac = "";
+    switch (tid) {
+        case 1: case 2: ac = "AC_BK"; break;
+        case 0: case 3: ac = "AC_BE"; break;
+        case 4: case 5: ac = "AC_VI"; break;
+        case 6: case 7: ac = "AC_VO"; break;
+        default: ac = "???"; break;
+    }
+    std::cout << " start=+" << simTime().inUnit(SIMTIME_PS) << ".0ps duration=+" << radioFrame->getDuration().inUnit(SIMTIME_PS) << ".0ps ac=" << ac << std::endl;
+
     scheduleAt(simTime() + radioFrame->getDuration(), endTransmissionTimer);
     updateTransceiverState();
     delete macFrame->removeControlInfo();
