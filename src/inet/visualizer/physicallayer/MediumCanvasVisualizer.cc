@@ -27,7 +27,7 @@ Define_Module(MediumCanvasVisualizer);
 
 MediumCanvasVisualizer::~MediumCanvasVisualizer()
 {
-    cancelAndDelete(updateCanvasTimer);
+    cancelAndDelete(signalPropagationUpdateTimer);
 }
 
 void MediumCanvasVisualizer::initialize(int stage)
@@ -63,8 +63,8 @@ void MediumCanvasVisualizer::initialize(int stage)
             canvas->addFigure(communicationHeat, 0);
         }
 #endif
-        updateInterval = par("updateCanvasInterval");
-        updateCanvasTimer = new cMessage("updateCanvas");
+        signalPropagationUpdateInterval = par("signalPropagationUpdateInterval");
+        signalPropagationUpdateTimer = new cMessage("signalPropagation");
     }
     else if (stage == INITSTAGE_LAST) {
         canvasProjection = CanvasProjection::getCanvasProjection(visualizerTargetModule->getCanvas());
@@ -93,8 +93,8 @@ void MediumCanvasVisualizer::initialize(int stage)
 
 void MediumCanvasVisualizer::handleMessage(cMessage *message)
 {
-    if (message == updateCanvasTimer)
-        scheduleUpdateCanvasTimer();
+    if (message == signalPropagationUpdateTimer)
+        scheduleSignalPropagationUpdateTimer();
     else
         throw cRuntimeError("Unknown message");
 }
@@ -170,8 +170,8 @@ void MediumCanvasVisualizer::transmissionAdded(const ITransmission *transmission
         groupFigure->addFigure(nameFigure);
         communicationLayer->addFigure(groupFigure);
         setCachedFigure(transmission, groupFigure);
-        if (updateInterval > 0)
-            scheduleUpdateCanvasTimer();
+        if (signalPropagationUpdateInterval > 0)
+            scheduleSignalPropagationUpdateTimer();
     }
 }
 
@@ -306,18 +306,18 @@ void MediumCanvasVisualizer::refreshDisplay()
     }
 }
 
-void MediumCanvasVisualizer::scheduleUpdateCanvasTimer()
+void MediumCanvasVisualizer::scheduleSignalPropagationUpdateTimer()
 {
-    if (updateCanvasTimer->isScheduled())
-        cancelEvent(updateCanvasTimer);
-    simtime_t nextUpdateTime = SimTime::getMaxTime();
+    if (signalPropagationUpdateTimer->isScheduled())
+        cancelEvent(signalPropagationUpdateTimer);
+    simtime_t earliestUpdateTime = SimTime::getMaxTime();
     for (auto transmission : transmissions) {
-        simtime_t transmissionNextUpdateTime = getTransmissionNextUpdateTime(transmission);
-        if (transmissionNextUpdateTime < nextUpdateTime)
-            nextUpdateTime = transmissionNextUpdateTime;
+        simtime_t nextSignalPropagationUpdateTime = getNextSignalPropagationUpdateTime(transmission);
+        if (nextSignalPropagationUpdateTime < earliestUpdateTime)
+            earliestUpdateTime = nextSignalPropagationUpdateTime;
     }
-    if (nextUpdateTime != SimTime::getMaxTime()) {
-        scheduleAt(nextUpdateTime, updateCanvasTimer);
+    if (earliestUpdateTime != SimTime::getMaxTime()) {
+        scheduleAt(earliestUpdateTime, signalPropagationUpdateTimer);
     }
 }
 

@@ -73,7 +73,7 @@ class INET_API MediumOsgVisualizer : public MediumVisualizerBase, public cListen
     /**
      * The message that is used to update the scene when ongoing communications exist.
      */
-    cMessage *updateSceneTimer = nullptr;
+    cMessage *signalPropagationUpdateTimer = nullptr;
     //@}
 
   protected:
@@ -91,7 +91,7 @@ class INET_API MediumOsgVisualizer : public MediumVisualizerBase, public cListen
 
     virtual osg::Node *createTransmissionNode(const ITransmission *transmission) const;
 
-    virtual void scheduleUpdateSceneTimer();
+    virtual void scheduleSignalPropagationUpdateTimer();
 
   public:
     virtual ~MediumOsgVisualizer();

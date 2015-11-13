@@ -40,7 +40,7 @@ Define_Module(MediumOsgVisualizer);
 
 MediumOsgVisualizer::~MediumOsgVisualizer()
 {
-    cancelAndDelete(updateSceneTimer);
+    cancelAndDelete(signalPropagationUpdateTimer);
 }
 
 void MediumOsgVisualizer::initialize(int stage)
@@ -81,16 +81,16 @@ void MediumOsgVisualizer::initialize(int stage)
         displayInterferenceRanges = par("displayInterferenceRanges");
         displayCommunicationRanges = par("displayCommunicationRanges");
         leaveCommunicationTrail = par("leaveCommunicationTrail");
-        updateInterval = par("updateSceneInterval");
-        updateSceneTimer = new cMessage("updateScene");
+        signalPropagationUpdateInterval = par("signalPropagationUpdateInterval");
+        signalPropagationUpdateTimer = new cMessage("signalPropagation");
         networkNodeVisualizer = getModuleFromPar<NetworkNodeOsgVisualizer>(par("networkNodeVisualizerModule"), this);
     }
 }
 
 void MediumOsgVisualizer::handleMessage(cMessage *message)
 {
-    if (message == updateSceneTimer)
-        scheduleUpdateSceneTimer();
+    if (message == signalPropagationUpdateTimer)
+        scheduleSignalPropagationUpdateTimer();
     else
         throw cRuntimeError("Unknown message");
 }
@@ -315,8 +315,8 @@ void MediumOsgVisualizer::transmissionAdded(const ITransmission *transmission)
         auto scene = inet::osg::getScene(visualizerTargetModule);
         scene->addChild(node);
         setCachedOsgNode(transmission, node);
-        if (updateInterval > 0)
-            scheduleUpdateSceneTimer();
+        if (signalPropagationUpdateInterval > 0)
+            scheduleSignalPropagationUpdateTimer();
     }
 }
 
@@ -438,18 +438,18 @@ void MediumOsgVisualizer::refreshDisplay()
     }
 }
 
-void MediumOsgVisualizer::scheduleUpdateSceneTimer()
+void MediumOsgVisualizer::scheduleSignalPropagationUpdateTimer()
 {
-    if (updateSceneTimer->isScheduled())
-        cancelEvent(updateSceneTimer);
-    simtime_t nextUpdateTime = SimTime::getMaxTime();
+    if (signalPropagationUpdateTimer->isScheduled())
+        cancelEvent(signalPropagationUpdateTimer);
+    simtime_t earliestUpdateTime = SimTime::getMaxTime();
     for (auto transmission : transmissions) {
-        simtime_t transmissionNextUpdateTime = getTransmissionNextUpdateTime(transmission);
-        if (transmissionNextUpdateTime < nextUpdateTime)
-            nextUpdateTime = transmissionNextUpdateTime;
+        simtime_t nextSignalPropagationUpdateTime = getNextSignalPropagationUpdateTime(transmission);
+        if (nextSignalPropagationUpdateTime < earliestUpdateTime)
+            earliestUpdateTime = nextSignalPropagationUpdateTime;
     }
-    if (nextUpdateTime != SimTime::getMaxTime()) {
-        scheduleAt(nextUpdateTime, updateSceneTimer);
+    if (earliestUpdateTime != SimTime::getMaxTime()) {
+        scheduleAt(earliestUpdateTime, signalPropagationUpdateTimer);
     }
 }
 

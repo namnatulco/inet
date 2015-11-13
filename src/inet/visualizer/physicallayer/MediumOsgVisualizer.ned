@@ -50,5 +50,5 @@ simple MediumOsgVisualizer extends MediumVisualizerBase like IMediumVisualizer
 
         bool leaveCommunicationTrail = default(false); // display recent successful receptions as straight blue lines from transmission location to reception location
 
-        double updateSceneInterval @unit(s) = default(0s); // time interval between scene updates when signals are propagating through the medium
+        double signalPropagationUpdateInterval @unit(s) = default(0s); // the time interval between updates when there are propagating signals on the medium
 }

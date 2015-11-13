@@ -36,8 +36,7 @@ class INET_API PhysicalEnvironmentOsgVisualizer : public PhysicalEnvironmentVisu
 
   protected:
     virtual void initialize(int stage) override;
-
-    virtual void updateScene();
+    virtual void refreshDisplay() override;
 
 #endif // ifdef WITH_OSG
 };

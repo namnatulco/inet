@@ -69,9 +69,9 @@ class INET_API MediumCanvasVisualizer : public MediumVisualizerBase
     /** @name Timer */
     //@{
     /**
-     * The message that is used to update the canvas when ongoing communications exist.
+     * The timer message that is used to update the canvas when propagating signals exist.
      */
-    cMessage *updateCanvasTimer = nullptr;
+    cMessage *signalPropagationUpdateTimer = nullptr;
     //@}
 
     /** @name Figures */
@@ -101,7 +101,7 @@ class INET_API MediumCanvasVisualizer : public MediumVisualizerBase
     virtual void setCachedFigure(const ITransmission *transmission, cFigure *figure);
     virtual void removeCachedFigure(const ITransmission *transmission);
 
-    virtual void scheduleUpdateCanvasTimer();
+    virtual void scheduleSignalPropagationUpdateTimer();
 
   public:
     virtual ~MediumCanvasVisualizer();

@@ -42,5 +42,5 @@ simple MediumCanvasVisualizer extends MediumVisualizerBase like IMediumVisualize
         bool leaveCommunicationTrail = default(false); // when enabled the radio medium displays recent successful receptions as straight blue lines from the transmission to the reception
         bool leaveCommunicationHeat = default(false); // when enabled the radio medium displays recent successful receptions as a heat map overlay
 
-        double updateCanvasInterval @unit(s) = default(0s); // the time interval between canvas updates when there are ongoing transmissions
+        double signalPropagationUpdateInterval @unit(s) = default(0s); // the time interval between updates when there are propagating signals on the medium
 }

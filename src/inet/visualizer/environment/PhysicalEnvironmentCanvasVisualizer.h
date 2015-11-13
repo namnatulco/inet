@@ -58,7 +58,8 @@ class INET_API PhysicalEnvironmentCanvasVisualizer : public PhysicalEnvironmentV
 
   protected:
     virtual void initialize(int stage) override;
-    virtual void updateCanvas();
+    virtual void refreshDisplay() override;
+
     virtual void computeFacePoints(const PhysicalObject *object, std::vector<std::vector<Coord> >& faces, const Rotation& rotation);
 };
 

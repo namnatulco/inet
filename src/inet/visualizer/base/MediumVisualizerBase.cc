@@ -33,7 +33,7 @@ void MediumVisualizerBase::initialize(int stage)
     }
 }
 
-simtime_t MediumVisualizerBase::getTransmissionNextUpdateTime(const ITransmission *transmission)
+simtime_t MediumVisualizerBase::getNextSignalPropagationUpdateTime(const ITransmission *transmission)
 {
     simtime_t now = simTime();
     ICommunicationCache *communicationCache = const_cast<ICommunicationCache *>(radioMedium->getCommunicationCache());
@@ -42,22 +42,20 @@ simtime_t MediumVisualizerBase::getTransmissionNextUpdateTime(const ITransmissio
     const simtime_t transmissionEndTime = transmission->getEndTime();
     const simtime_t interferenceEndTime = communicationCache->getCachedInterferenceEndTime(transmission);
     simtime_t maxPropagationTime = interferenceEndTime - transmissionEndTime - mediumLimitCache->getMaxTransmissionDuration();
-    if (transmissionStartTime <= now && now < transmissionStartTime + maxPropagationTime)
-    {
-        simtime_t nextUpdateTime = now + updateInterval;
+    if (transmissionStartTime <= now && now < transmissionStartTime + maxPropagationTime) {
+        simtime_t nextUpdateTime = now + signalPropagationUpdateInterval;
         return nextUpdateTime > transmissionStartTime + maxPropagationTime ? transmissionStartTime + maxPropagationTime : nextUpdateTime;
     }
-    else if (transmissionEndTime <= now && now < transmissionEndTime + maxPropagationTime)
-    {
-        simtime_t nextUpdateTime = now + updateInterval;
+    else if (transmissionEndTime <= now && now < transmissionEndTime + maxPropagationTime) {
+        simtime_t nextUpdateTime = now + signalPropagationUpdateInterval;
         return nextUpdateTime > transmissionEndTime + maxPropagationTime ? transmissionEndTime + maxPropagationTime : nextUpdateTime;
     }
     else if (transmissionStartTime + maxPropagationTime <= now && now < transmissionEndTime) {
-        simtime_t nextUpdateTime = now + updateInterval + 2 * (now - transmissionStartTime - maxPropagationTime);
+        simtime_t nextUpdateTime = now + signalPropagationUpdateInterval + 2 * (now - transmissionStartTime - maxPropagationTime);
         return nextUpdateTime > transmissionEndTime ? transmissionEndTime : nextUpdateTime;
     }
     else if (transmissionEndTime + maxPropagationTime <= now && now < interferenceEndTime) {
-        simtime_t nextUpdateTime = now + updateInterval + 2 * (now - transmissionEndTime - maxPropagationTime);
+        simtime_t nextUpdateTime = now + signalPropagationUpdateInterval + 2 * (now - transmissionEndTime - maxPropagationTime);
         return nextUpdateTime > interferenceEndTime ? interferenceEndTime : nextUpdateTime;
     }
     else

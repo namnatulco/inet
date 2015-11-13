@@ -40,13 +40,13 @@ class INET_API MediumVisualizerBase : public VisualizerBase, public RadioMedium:
     /** @name Parameters */
     //@{
     RadioMedium *radioMedium = nullptr;
-    simtime_t updateInterval = NaN;
+    simtime_t signalPropagationUpdateInterval = NaN;
     //@}
 
   protected:
     virtual void initialize(int stage) override;
 
-    virtual simtime_t getTransmissionNextUpdateTime(const ITransmission *transmission);
+    virtual simtime_t getNextSignalPropagationUpdateTime(const ITransmission *transmission);
 };
 
 } // namespace visualizer

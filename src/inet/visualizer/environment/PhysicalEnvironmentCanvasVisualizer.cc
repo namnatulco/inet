@@ -39,82 +39,81 @@ void PhysicalEnvironmentCanvasVisualizer::initialize(int stage)
         canvas->addFigureBelow(objectsLayer, canvas->getSubmodulesLayer());
         canvasProjection = CanvasProjection::getCanvasProjection(visualizerTargetModule->getCanvas());
     }
-    else if (stage == INITSTAGE_LAST) {
-        if (physicalEnvironment != nullptr)
-            updateCanvas();
-    }
 }
 
-void PhysicalEnvironmentCanvasVisualizer::updateCanvas()
+void PhysicalEnvironmentCanvasVisualizer::refreshDisplay()
 {
-    while (objectsLayer->getNumFigures())
-        delete objectsLayer->removeFigure(0);
-    // KLUDGE: TODO: sorting objects with their rotated position's z coordinate to draw them in a "better" order
-    std::vector<const PhysicalObject *> objectsCopy;
-    for (int i = 0; i < physicalEnvironment->getNumObjects(); i++)
-        objectsCopy.push_back(physicalEnvironment->getObject(i));
-    std::stable_sort(objectsCopy.begin(), objectsCopy.end(), ObjectPositionComparator(canvasProjection->getRotation()));
-    for (auto object : objectsCopy) {
-        const ShapeBase *shape = object->getShape();
-        const Coord& position = object->getPosition();
-        const EulerAngles& orientation = object->getOrientation();
-        const Rotation rotation(orientation);
-        // cuboid
-        const Cuboid *cuboid = dynamic_cast<const Cuboid *>(shape);
-        if (cuboid) {
-            std::vector<std::vector<Coord> > faces;
-            cuboid->computeVisibleFaces(faces, rotation, canvasProjection->getRotation());
-            computeFacePoints(object, faces, rotation);
-        }
-        // sphere
-        const Sphere *sphere = dynamic_cast<const Sphere *>(shape);
-        if (sphere) {
-            double radius = sphere->getRadius();
-            cOvalFigure *figure = new cOvalFigure();
-            figure->setFilled(true);
-            cFigure::Point center = canvasProjection->computeCanvasPoint(position);
-            figure->setBounds(cFigure::Rectangle(center.x - radius, center.y - radius, radius * 2, radius * 2));
-            figure->setLineWidth(object->getLineWidth());
-            figure->setLineColor(object->getLineColor());
-            figure->setFillColor(object->getFillColor());
+    // only update after initialize
+    if (physicalEnvironment != nullptr && getSimulation()->getEventNumber() == 1) {
+        while (objectsLayer->getNumFigures())
+            delete objectsLayer->removeFigure(0);
+        // KLUDGE: TODO: sorting objects with their rotated position's z coordinate to draw them in a "better" order
+        std::vector<const PhysicalObject *> objectsCopy;
+        for (int i = 0; i < physicalEnvironment->getNumObjects(); i++)
+            objectsCopy.push_back(physicalEnvironment->getObject(i));
+        std::stable_sort(objectsCopy.begin(), objectsCopy.end(), ObjectPositionComparator(canvasProjection->getRotation()));
+        for (auto object : objectsCopy) {
+            const ShapeBase *shape = object->getShape();
+            const Coord& position = object->getPosition();
+            const EulerAngles& orientation = object->getOrientation();
+            const Rotation rotation(orientation);
+            // cuboid
+            const Cuboid *cuboid = dynamic_cast<const Cuboid *>(shape);
+            if (cuboid) {
+                std::vector<std::vector<Coord> > faces;
+                cuboid->computeVisibleFaces(faces, rotation, canvasProjection->getRotation());
+                computeFacePoints(object, faces, rotation);
+            }
+            // sphere
+            const Sphere *sphere = dynamic_cast<const Sphere *>(shape);
+            if (sphere) {
+                double radius = sphere->getRadius();
+                cOvalFigure *figure = new cOvalFigure();
+                figure->setFilled(true);
+                cFigure::Point center = canvasProjection->computeCanvasPoint(position);
+                figure->setBounds(cFigure::Rectangle(center.x - radius, center.y - radius, radius * 2, radius * 2));
+                figure->setLineWidth(object->getLineWidth());
+                figure->setLineColor(object->getLineColor());
+                figure->setFillColor(object->getFillColor());
 #if OMNETPP_CANVAS_VERSION >= 0x20140908
-            figure->setLineOpacity(object->getOpacity());
-            figure->setFillOpacity(object->getOpacity());
-            figure->setZoomLineWidth(false);
+                figure->setLineOpacity(object->getOpacity());
+                figure->setFillOpacity(object->getOpacity());
+                figure->setZoomLineWidth(false);
 #endif
-            std::string tags("physical_object ");
-            if (object->getTags())
-                tags += object->getTags();
-            figure->setTags(tags.c_str());
-            objectsLayer->addFigure(figure);
-        }
-        // prism
-        const Prism *prism = dynamic_cast<const Prism *>(shape);
-        if (prism) {
-            std::vector<std::vector<Coord> > faces;
-            prism->computeVisibleFaces(faces, rotation, canvasProjection->getRotation());
-            computeFacePoints(object, faces, rotation);
-        }
-        // polyhedron
-        const Polyhedron *polyhedron = dynamic_cast<const Polyhedron *>(shape);
-        if (polyhedron) {
-            std::vector<std::vector<Coord> > faces;
-            polyhedron->computeVisibleFaces(faces, rotation, canvasProjection->getRotation());
-            computeFacePoints(object, faces, rotation);
-        }
-        // add name to the end
-        const char *name = object->getName();
-        if (name) {
+                std::string tags("physical_object ");
+                if (object->getTags())
+                    tags += object->getTags();
+                figure->setTags(tags.c_str());
+                objectsLayer->addFigure(figure);
+            }
+            // prism
+            const Prism *prism = dynamic_cast<const Prism *>(shape);
+            if (prism) {
+                std::vector<std::vector<Coord> > faces;
+                prism->computeVisibleFaces(faces, rotation, canvasProjection->getRotation());
+                computeFacePoints(object, faces, rotation);
+            }
+            // polyhedron
+            const Polyhedron *polyhedron = dynamic_cast<const Polyhedron *>(shape);
+            if (polyhedron) {
+                std::vector<std::vector<Coord> > faces;
+                polyhedron->computeVisibleFaces(faces, rotation, canvasProjection->getRotation());
+                computeFacePoints(object, faces, rotation);
+            }
+            // add name to the end
+            const char *name = object->getName();
+            if (name) {
 #if OMNETPP_CANVAS_VERSION >= 0x20140908
-            cLabelFigure *nameFigure = new cLabelFigure();
-            nameFigure->setPosition(canvasProjection->computeCanvasPoint(position));
+                cLabelFigure *nameFigure = new cLabelFigure();
+                nameFigure->setPosition(canvasProjection->computeCanvasPoint(position));
 #else
-            cTextFigure *nameFigure = new cTextFigure();
-            nameFigure->setLocation(canvasProjection->computeCanvasPoint(position));
+                cTextFigure *nameFigure = new cTextFigure();
+                nameFigure->setLocation(canvasProjection->computeCanvasPoint(position));
 #endif
-            nameFigure->setTags("physical_object object_name label");
-            nameFigure->setText(name);
-            objectsLayer->addFigure(nameFigure);
+                nameFigure->setTags("physical_object object_name label");
+                nameFigure->setText(name);
+                objectsLayer->addFigure(nameFigure);
+            }
         }
     }
 }
