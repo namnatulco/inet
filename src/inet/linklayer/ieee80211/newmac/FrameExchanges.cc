@@ -165,7 +165,13 @@ void SendDataWithAckFrameExchange::doStep(int step)
     switch (step) {
         case 0: startContention(retryCount); break;
         case 1: transmitFrame(dupPacketAndControlInfo(dataFrame)); break;
-        case 2: expectReplyRxStartWithin(utils->getAckEarlyTimeout()); break;
+        case 2: {
+            if (true)
+                expectFullReplyWithin(utils->getAckFullTimeout());
+            else
+                expectReplyRxStartWithin(utils->getAckEarlyTimeout());
+            break;
+        }
         case 3: statistics->frameTransmissionSuccessful(dataFrame, retryCount); releaseChannel(); succeed(); break;
         default: ASSERT(false);
     }
@@ -190,7 +196,7 @@ void SendDataWithAckFrameExchange::processTimeout(int step)
 void SendDataWithAckFrameExchange::processInternalCollision(int step)
 {
     switch (step) {
-        case 0: retry(); retryCount--; break; // KLUDGE: don't increment to match ns3
+        case 0: retryCount--; retry(); break;
         default: ASSERT(false);
     }
 }
@@ -198,15 +204,32 @@ void SendDataWithAckFrameExchange::processInternalCollision(int step)
 void SendDataWithAckFrameExchange::retry()
 {
     releaseChannel();
-    if (retryCount < params->getShortRetryLimit()) {
+    // 9.19.2.6 Retransmit procedures
+    // Retries for failed transmission attempts shall continue until the short retry count for the MSDU, A-MSDU, or
+    // MMPDU is equal to dot11ShortRetryLimit or until the long retry count for the MSDU, A-MSDU, or MMPDU
+    // is equal to dot11LongRetryLimit.
+    //
+    // Annex C MIB
+    // This attribute indicates the maximum number of transmission attempts of a
+    // frame, the length of which is less than or equal to dot11RTSThreshold,
+    // that is made before a failure condition is indicated.
+    static const char *ac[] = {"AC_BK", "AC_BE", "AC_VI", "AC_VO", "???"};
+    const char *lastSeq = strchr(dataFrame->getName(), '-') + 1;
+    if (retryCount + 1 < params->getShortRetryLimit()) {
         statistics->frameTransmissionUnsuccessful(dataFrame, retryCount);
         dataFrame->setRetry(true);
         retryCount++;
         gotoStep(0);
+        std::cout << "RE: " << "ac = " << ac[defaultAccessCategory] << ", seq = " << lastSeq << ", num = " << retryCount << endl;
     }
     else {
         statistics->frameTransmissionUnsuccessfulGivingUp(dataFrame, retryCount);
         fail();
+        if (*lastSeq == '0' && defaultAccessCategory == 1)
+        {
+            std::cout << "BREAK\n";
+        }
+        std::cout << "CA: " << "ac = " << ac[defaultAccessCategory] << ", seq = " << lastSeq << endl;
     }
 }
 

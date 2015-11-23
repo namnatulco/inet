@@ -26,6 +26,7 @@ import inet.physicallayer.ieee80211.packetlevel.Ieee80211ScalarRadioMedium;
 network QosThroughput
 {
     parameters:
+        int numHosts;
         @display("b=297,203");
     submodules:
         configurator: IPv4NetworkConfigurator {
@@ -35,7 +36,7 @@ network QosThroughput
             parameters:
                 @display("r=,,#707070");
         }
-        cliHost: AdhocHost {
+        cliHost[numHosts]: AdhocHost {
             parameters:
                 @display("r=,,#707070");
         }
