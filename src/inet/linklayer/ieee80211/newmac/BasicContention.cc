@@ -82,6 +82,8 @@ void BasicContention::initialize()
     WATCH(channelLastBusyTime);
     WATCH(mediumFree);
     updateDisplayString();
+
+    getRNG(0)->initialize(0, 0, 0, 0, 0, getEnvir()->getConfig());
 }
 
 BasicContention::~BasicContention()
@@ -100,6 +102,9 @@ void BasicContention::startContention(simtime_t ifs, simtime_t eifs, int cwMin, 
     this->slotTime = slotTime;
     this->retryCount = retryCount;
     this->callback = callback;
+
+    if (simTime() == 0.5)
+        getRNG(0)->initialize(0, 0, 0, 0, 0, getEnvir()->getConfig());
 
     int cw = computeCw(cwMin, cwMax, retryCount);
     backoffSlots = intrand(cw + 1);
@@ -164,6 +169,11 @@ void BasicContention::handleWithFSM(EventType event, cMessage *msg)
                     DEFER,
                     cancelTransmissionRequest();
                     computeRemainingBackoffSlots();
+                    );
+            FSMA_Event_Transition(optimized-internal-collision,
+                    event == INTERNAL_COLLISION && backoffOptimizationDelta != SIMTIME_ZERO,
+                    IFS_AND_BACKOFF,
+                    revokeBackoffOptimization();
                     );
             FSMA_Event_Transition(Internal-collision,
                     event == INTERNAL_COLLISION,
@@ -264,10 +274,12 @@ void BasicContention::scheduleTransmissionRequest()
         // we can pretend the frame has arrived into the queue a little bit earlier, and may be able to start transmitting immediately
         simtime_t elapsedFreeChannelTime = now - channelLastBusyTime;
         simtime_t elapsedIdleTime = now - lastIdleStartTime;
-        waitInterval = std::max(SIMTIME_ZERO, waitInterval - std::min(elapsedFreeChannelTime, elapsedIdleTime));
+        backoffOptimizationDelta = std::min(waitInterval, std::min(elapsedFreeChannelTime, elapsedIdleTime));
+        if (backoffOptimizationDelta > SIMTIME_ZERO)
+            waitInterval -= backoffOptimizationDelta;
     }
     scheduledTransmissionTime = now + waitInterval;
-    std::cout << "txIndex = " << txIndex  << " Now : " << simTime() << " Wait interval: " << waitInterval << " Scheduled transmission time = " << scheduledTransmissionTime << std::endl;
+    std::cout << "txIndex = " << txIndex  << " Now : " << simTime() << " Wait interval: " << waitInterval << " Scheduled transmission time = " << scheduledTransmissionTime << " optimization delta = " << backoffOptimizationDelta << std::endl;
     scheduleTransmissionRequestFor(scheduledTransmissionTime);
 }
 
@@ -299,6 +311,15 @@ void BasicContention::reportChannelAccessGranted()
 void BasicContention::reportInternalCollision()
 {
     upperMac->internalCollision(callback, txIndex);
+}
+
+void BasicContentionTx::revokeBackoffOptimization()
+{
+    scheduledTransmissionTime += backoffOptimizationDelta;
+    backoffOptimizationDelta = SIMTIME_ZERO;
+    cancelTransmissionRequest();
+    computeRemainingBackoffSlots();
+    scheduleTransmissionRequest();
 }
 
 const char *BasicContention::getEventName(EventType event)

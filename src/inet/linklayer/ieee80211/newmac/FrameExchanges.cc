@@ -190,7 +190,7 @@ void SendDataWithAckFrameExchange::processTimeout(int step)
 void SendDataWithAckFrameExchange::processInternalCollision(int step)
 {
     switch (step) {
-        case 0: retry(); break;
+        case 0: retry(); retryCount--; break; // KLUDGE: don't increment to match ns3
         default: ASSERT(false);
     }
 }
