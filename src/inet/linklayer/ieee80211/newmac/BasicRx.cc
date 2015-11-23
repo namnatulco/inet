@@ -117,6 +117,7 @@ void BasicRx::receptionStateChanged(IRadio::ReceptionState state)
 {
     Enter_Method_Silent();
     receptionState = state;
+    //std::cout << "Now =" << simTime() << " Reception state changed to " << state << std::endl;
     recomputeMediumFree();
 }
 
@@ -124,6 +125,7 @@ void BasicRx::transmissionStateChanged(IRadio::TransmissionState state)
 {
     Enter_Method_Silent();
     transmissionState = state;
+    std::cout << "Now =" << simTime() << " Transmission state changed to " << state << std::endl;
     recomputeMediumFree();
 }
 

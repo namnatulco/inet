@@ -201,6 +201,7 @@ void BasicContention::mediumStateChanged(bool mediumFree)
     Enter_Method_Silent(mediumFree ? "medium FREE" : "medium BUSY");
     this->mediumFree = mediumFree;
     channelLastBusyTime = simTime();
+    std::cout << "Medium state changed: " << mediumFree << "State = " << fsm.getStateName() << std::endl;
     handleWithFSM(MEDIUM_STATE_CHANGED, nullptr);
 }
 
@@ -225,6 +226,7 @@ void BasicContention::transmissionGranted(int txIndex)
 void BasicContention::internalCollision(int txIndex)
 {
     Enter_Method("internalCollision()");
+    std::cout <<"txIndex= " << txIndex << " Internal collision" << std::endl;
     handleWithFSM(INTERNAL_COLLISION, nullptr);
 }
 
@@ -267,6 +269,7 @@ void BasicContention::scheduleTransmissionRequest()
             waitInterval -= elapsedFreeChannelTime;
     }
     scheduledTransmissionTime = now + waitInterval;
+    std::cout << "txIndex = " << txIndex  << " Now : " << simTime() << " Wait interval: " << waitInterval << " Scheduled transmission time = " << scheduledTransmissionTime << std::endl;
     scheduleTransmissionRequestFor(scheduledTransmissionTime);
 }
 
@@ -280,13 +283,14 @@ void BasicContention::switchToEifs()
 void BasicContention::computeRemainingBackoffSlots()
 {
     simtime_t remainingTime = scheduledTransmissionTime - simTime();
-    int remainingSlots = (int)ceil(remainingTime / slotTime);  //TODO this is not accurate
+    int remainingSlots = (int)ceil((remainingTime+slotTime/100) / slotTime);  //TODO this is not accurate
     if (remainingSlots < backoffSlots) { // don't count IFS
         ASSERT(remainingSlots >= 0);
         EV_DEBUG << "old backoff[" << getIndex() << "] period is " << backoffSlots * slotTime << ", remainingTime " << remainingTime << endl;
         backoffSlots = remainingSlots;
         EV_DEBUG << "backoff[" << getIndex() << "] period decreased to " << backoffSlots * slotTime << endl;
     }
+    std::cout << "txIndex=" << txIndex << ", remaining backoff slots:" << backoffSlots << std::endl;
 }
 
 void BasicContention::reportChannelAccessGranted()

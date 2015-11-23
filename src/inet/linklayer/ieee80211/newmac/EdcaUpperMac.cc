@@ -114,6 +114,7 @@ IMacParameters *EdcaUpperMac::extractParameters(const IIeee80211Mode *slowestMan
     params->setEdcaEnabled(true);
     params->setSlotTime(fallback(par("slotTime"), referenceMode->getSlotTime()));
     params->setSifsTime(fallback(par("sifsTime"), referenceMode->getSifsTime()));
+    params->getSifsTime();
     int aCwMin = referenceMode->getLegacyCwMin();
     int aCwMax = referenceMode->getLegacyCwMax();
 
@@ -344,6 +345,8 @@ void EdcaUpperMac::frameExchangeFinished(IFrameExchange *what, bool successful)
         int txIndex = (int)ac;  //one-to-one mapping
         startSendDataFrameExchange(frame, txIndex, ac);
     }
+    else
+        std::cout << "AC=" << ac << " Tx queue is empty" << std::endl;
 }
 
 void EdcaUpperMac::sendAck(Ieee80211DataOrMgmtFrame *frame)
