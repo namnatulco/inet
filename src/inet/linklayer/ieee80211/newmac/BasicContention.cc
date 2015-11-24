@@ -108,6 +108,10 @@ void BasicContention::startContention(simtime_t ifs, simtime_t eifs, int cwMin, 
 
     int cw = computeCw(cwMin, cwMax, retryCount);
     backoffSlots = intrand(cw + 1);
+
+    static const char *AC[] = {"AC_BE", "AC_BK", "AC_VI", "AC_VO"};
+    std::cout << "GB: " << "ac = " << AC[getIndex()] << ", cw = " << cw << ", slots = " << backoffSlots << std::endl;
+
     handleWithFSM(START, nullptr);
 }
 
@@ -178,7 +182,7 @@ void BasicContention::handleWithFSM(EventType event, cMessage *msg)
             FSMA_Event_Transition(Internal-collision,
                     event == INTERNAL_COLLISION,
                     IDLE,
-                    finallyReportInternalCollision = true; delete frame; lastIdleStartTime = simTime();
+                    finallyReportInternalCollision = true; lastIdleStartTime = simTime();
                     );
             FSMA_Event_Transition(Use-EIFS,
                     event == CORRUPTED_FRAME_RECEIVED,
@@ -300,6 +304,7 @@ void BasicContention::computeRemainingBackoffSlots()
         backoffSlots = remainingSlots;
         EV_DEBUG << "backoff[" << getIndex() << "] period decreased to " << backoffSlots * slotTime << endl;
     }
+//    std::cout << "BK: " << "ac = " << "???" << ", slots = " << backoffSlots << std::endl;
     std::cout << "txIndex=" << txIndex << ", remaining backoff slots:" << backoffSlots << std::endl;
 }
 
@@ -313,7 +318,7 @@ void BasicContention::reportInternalCollision()
     upperMac->internalCollision(callback, txIndex);
 }
 
-void BasicContentionTx::revokeBackoffOptimization()
+void BasicContention::revokeBackoffOptimization()
 {
     scheduledTransmissionTime += backoffOptimizationDelta;
     backoffOptimizationDelta = SIMTIME_ZERO;

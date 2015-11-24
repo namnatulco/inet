@@ -308,7 +308,12 @@ void Radio::startTransmission(cPacket *macFrame)
         case 6: case 7: ac = "AC_VO"; break;
         default: ac = "???"; break;
     }
-    std::cout << " start=+" << simTime().inUnit(SIMTIME_PS) << ".0ps duration=+" << radioFrame->getDuration().inUnit(SIMTIME_PS) << ".0ps ac=" << ac << std::endl;
+    const char *lastSeq = strchr(macFrame->getName(), '-');
+    if (lastSeq == nullptr)
+        lastSeq = "-1";
+    else
+        lastSeq++;
+    std::cout << "TX: " << "ac = " << ac << ", seq = " << lastSeq << ", start = " << simTime().inUnit(SIMTIME_PS) << ", duration = " << radioFrame->getDuration().inUnit(SIMTIME_PS) << std::endl;
 
     scheduleAt(simTime() + radioFrame->getDuration(), endTransmissionTimer);
     updateTransceiverState();
