@@ -19,7 +19,7 @@ network = Test1
 %#--------------------------------------------------------------------------------------------------------------
 %postrun-command: echo FAKE inet.out
 %#--------------------------------------------------------------------------------------------------------------
-%postrun-command: pwd ; cd ../../ns3; ./waf --run "examples/wireless/inet-wireless-throughputudp-qos --withQos=false --serverYPos=30.0 --numClients=1 --numApps=1"
+%postrun-command: pwd ; cd ../../ns3; ./waf --run "examples/wireless/inet-wireless-throughputudp-qos --withQos=false --serverYPos=3000.0 --numClients=1 --numApps=1"
 %#--------------------------------------------------------------------------------------------------------------
 %postrun-command: diff -s postrun-command\(1\).out postrun-command\(2\).out ; echo ""
 %#--------------------------------------------------------------------------------------------------------------
