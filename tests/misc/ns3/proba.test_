@@ -1,0 +1,30 @@
+%description:
+Tests differences between inet and ns3: one node try to send packets to an unavailable node
+%#--------------------------------------------------------------------------------------------------------------
+%testprog: opp_run
+%#--------------------------------------------------------------------------------------------------------------
+%file: test.ned
+
+network Test1
+{
+}
+
+%#--------------------------------------------------------------------------------------------------------------
+%inifile: omnetpp.ini
+
+[General]
+description = "Simple test"
+network = Test1
+
+%#--------------------------------------------------------------------------------------------------------------
+%postrun-command: pwd ; cd ../../ns3; ./waf --run examples/wireless/inet-wireless-throughputudp
+%#--------------------------------------------------------------------------------------------------------------
+%postrun-command: pwd
+%#--------------------------------------------------------------------------------------------------------------
+run-inet-wireless-throughputudp
+run-inet-wireless-throughputudp-nonqos
+run-inet-wireless-throughputudp-qos
+run-inet-wireless-throughputudp-qos-dbg
+run-inet-wireless-throughputudp-qos-vis
+run-inet-wireless-throughputudp-vis
+runtest

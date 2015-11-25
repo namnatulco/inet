@@ -1,0 +1,6 @@
+NS3 - INET comparison tests
+
+before run, you should create 'ns3' folder here or 'ns3' symlink to your ns3 folder
+original ns3 not enough, please use patch files in ns3.
+
+//TODO create patch files from omnetpp/ns3 repo
