@@ -1,21 +1,34 @@
 # ignore generated files
 .settings/
+inet/.settings/
 *_m.h
 *_m.cc
 *_sm.h
 *_sm.cc
 src/Makefile
+/inet/src/Makefile
+/inet/src/Makefile.vc
 src/Makefile.vc
 /doc/doxy/
+/inet/doc/doxy/
 /doc/neddoc/
+/inet/doc/neddoc/
 /doc/src/manual/figures/*.pdf
+/inet/doc/src/manual/figures/*.pdf
 /doc/src/manual/inet-manual.pdf
+/inet/doc/src/manual/inet-manual.pdf
 /examples/*/results/
+/inet/examples/*/results/
 /examples/*/*/results/
+/inet/examples/*/*/results/
 /examples/*/*/*/results/
+/inet/examples/*/*/*/results/
 /tests/*/work/
+/inet/tests/*/work/
 /tests/*/*/work/
+/inet/tests/*/*/work/
 /tests/*/results*/
+/inet/tests/*/results*/
 *.log
 *.sim
 *.pyc
@@ -26,6 +39,7 @@ src/Makefile.vc
 .buildlog*
 # ignore binary files
 out/
+inet/out/
 *.so
 *.dylib
 *.dll
